@@ -16,8 +16,8 @@
             android:name=".ui.auth.AuthActivity"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
-                <action android:name="android.intenet.action.MAIN" />
-                <category android:name="andoid.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
