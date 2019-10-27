@@ -18,7 +18,7 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [
-                        "room.schemalocation"  : "$projectDir/schemas".toString(),
+                        "room.schemaLocation"  : "$projectDir/schemas".toString(),
                         "room.incremental"     : "true",
                         "room.expandProjection": "true"]
             }
@@ -74,7 +74,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
 
     // Room
-    def room_version = "2.2.0"
+    def room_version = "2.2.0-rc01"
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     // Kotlin Extensions and Coroutines support for Room
@@ -97,7 +97,6 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     implementation "androidx.navigation:navigation-runtime:$nav_version"
-
 
     def material_version = "1.1.0-alpha09"
     implementation "com.google.android.material:material:$material_version"
