@@ -3,7 +3,7 @@ package se.hkr.smarthouse.di.auth
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
-import se.hkr.smarthouse.api.auth.SmarthouseAuthService
+import se.hkr.smarthouse.api.auth.OpenApiAuthService
 import se.hkr.smarthouse.persistence.AccountCredentialsDao
 import se.hkr.smarthouse.repository.auth.AuthRepository
 import se.hkr.smarthouse.session.SessionManager
@@ -12,12 +12,10 @@ import se.hkr.smarthouse.session.SessionManager
 class AuthModule {
     @AuthScope
     @Provides
-    fun provideFakeApiService(): SmarthouseAuthService {
-        return Retrofit
-            .Builder()
-            .baseUrl("https://open-api.xyz")
+    fun provideFakeApiService(retrofitBuilder: Retrofit.Builder): OpenApiAuthService {
+        return retrofitBuilder
             .build()
-            .create(SmarthouseAuthService::class.java)
+            .create(OpenApiAuthService::class.java)
     }
 
     @AuthScope
@@ -25,12 +23,12 @@ class AuthModule {
     fun provideAuthRepository(
         sessionManager: SessionManager,
         accountCredentialsDao: AccountCredentialsDao,
-        smarthouseAuthService: SmarthouseAuthService
+        openApiAuthService: OpenApiAuthService
     ): AuthRepository {
         return AuthRepository(
             sessionManager = sessionManager,
             accountCredentialsDao = accountCredentialsDao,
-            smarthouseAuthService = smarthouseAuthService
+            openApiAuthService = openApiAuthService
         )
     }
 }
