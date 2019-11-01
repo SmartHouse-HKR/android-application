@@ -19,4 +19,7 @@ interface AccountCredentialsDao {
 
     @Query("SELECT * FROM account_credentials WHERE email = :email")
     fun searchByEmail(email: String): AccountCredentials?
+
+    @Query("UPDATE account_credentials SET pk = null WHERE pk = :pk")
+    fun nullifyToken(pk: Int): Int
 }

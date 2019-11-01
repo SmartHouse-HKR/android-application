@@ -7,6 +7,7 @@ import se.hkr.smarthouse.di.auth.AuthModule
 import se.hkr.smarthouse.di.auth.AuthScope
 import se.hkr.smarthouse.di.auth.AuthViewModelModule
 import se.hkr.smarthouse.ui.auth.AuthActivity
+import se.hkr.smarthouse.ui.main.MainActivity
 
 @Module
 abstract class ActivityBuildersModule {
@@ -20,4 +21,7 @@ abstract class ActivityBuildersModule {
         ]
     )
     abstract fun contributeAuthActivity(): AuthActivity
+
+    @ContributesAndroidInjector
+    abstract fun contributeMainActivity(): MainActivity
 }

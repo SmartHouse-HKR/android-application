@@ -8,4 +8,8 @@
     <string name="password">Password</string>
     <string name="confirm_password">Confirm password</string>
     <string name="forgot_password">Forgot password</string>
+
+    <string name="create">Create</string>
+    <string name="account">Account</string>
+    <string name="home">Home</string>
 </resources>
