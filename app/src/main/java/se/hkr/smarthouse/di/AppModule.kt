@@ -1,4 +1,4 @@
-package se.hkr.androidjetpack.di
+package se.hkr.smarthouse.di
 
 import android.app.Application
 import androidx.room.Room
@@ -12,9 +12,10 @@ import dagger.Provides
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import se.hkr.smarthouse.R
-import se.hkr.smarthouse.persistence.AccountCredentialsDao
+import se.hkr.smarthouse.persistence.AccountPropertiesDao
 import se.hkr.smarthouse.persistence.AppDatabase
 import se.hkr.smarthouse.persistence.AppDatabase.Companion.DATABASE_NAME
+import se.hkr.smarthouse.persistence.AuthTokenDao
 import se.hkr.smarthouse.util.Constants
 import se.hkr.smarthouse.util.LiveDataCallAdapterFactory
 import javax.inject.Singleton
@@ -48,8 +49,14 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun provideAccountCredentialsDao(appDatabase: AppDatabase): AccountCredentialsDao {
-        return appDatabase.getLoginCredentialsDao()
+    fun provideAccountPropertiesDao(appDatabase: AppDatabase): AccountPropertiesDao {
+        return appDatabase.getAccountPropertiesDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideAuthTokenDao(appDatabase: AppDatabase): AuthTokenDao {
+        return appDatabase.getAuthTokenDao()
     }
 
     @Singleton

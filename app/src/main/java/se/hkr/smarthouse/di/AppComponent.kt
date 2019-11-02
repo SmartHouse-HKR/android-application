@@ -1,4 +1,4 @@
-package se.hkr.androidjetpack.di
+package se.hkr.smarthouse.di
 
 import android.app.Application
 import dagger.BindsInstance
@@ -6,8 +6,6 @@ import dagger.Component
 import dagger.android.AndroidInjectionModule
 import dagger.android.AndroidInjector
 import se.hkr.smarthouse.BaseApplication
-import se.hkr.smarthouse.di.ActivityBuildersModule
-import se.hkr.smarthouse.di.ViewModelFactoryModule
 import se.hkr.smarthouse.session.SessionManager
 import javax.inject.Singleton
 

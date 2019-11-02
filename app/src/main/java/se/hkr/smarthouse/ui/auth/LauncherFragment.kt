@@ -1,7 +1,6 @@
 package se.hkr.smarthouse.ui.auth
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,6 @@ class LauncherFragment : BaseAuthFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "LauncherFragment: ${viewModel.hashCode()}")
         attachListeners()
         // Request focus to avoid bug with something else getting the focus
         focusable_view.requestFocus()
