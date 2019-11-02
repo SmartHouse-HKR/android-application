@@ -11,29 +11,31 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import se.hkr.smarthouse.models.AccountCredentials
-import se.hkr.smarthouse.persistence.AccountCredentialsDao
+import se.hkr.smarthouse.models.AuthToken
+import se.hkr.smarthouse.persistence.AuthTokenDao
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SessionManager
 @Inject
 constructor(
-    val accountCredentialsDao: AccountCredentialsDao,
+    val authTokenDao: AuthTokenDao,
     val application: Application
 ) {
     private val TAG: String = "AppDebug"
-    private val _cachedCredentials = MutableLiveData<AccountCredentials>()
-    val cachedCredentials: LiveData<AccountCredentials>
-        get() = _cachedCredentials
+    private val _cachedToken = MutableLiveData<AuthToken>()
+    val cachedToken: LiveData<AuthToken>
+        get() = _cachedToken
 
-    fun login(newValue: AccountCredentials) {
+    fun login(newValue: AuthToken) {
         setValue(newValue)
     }
 
-    fun setValue(newValue: AccountCredentials?) {
+    fun setValue(newValue: AuthToken?) {
         GlobalScope.launch(Main) {
-            if (_cachedCredentials.value != newValue) {
-                _cachedCredentials.value = newValue
+            if (_cachedToken.value != newValue) {
+                _cachedToken.value = newValue
             }
         }
     }
@@ -43,8 +45,9 @@ constructor(
         CoroutineScope(Main).launch {
             var errorMessage: String? = null
             try {
-                _cachedCredentials.value?.pk?.let {
-                    accountCredentialsDao.nullifyToken(it)
+                _cachedToken.value!!.account_pk?.let {
+                    authTokenDao.nullifyToken(it)
+                    Log.d(TAG, "nullified token inside room db")
                 } ?: throw CancellationException("Token Error. Logging out user")
             } catch (e: CancellationException) {
                 Log.e(TAG, "logout: ${e.message}")

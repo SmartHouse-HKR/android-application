@@ -1,4 +1,4 @@
-package se.hkr.androidjetpack.ui.auth.state
+package se.hkr.smarthouse.ui.auth.state
 
 sealed class AuthStateEvent {
     data class LoginAttemptEvent(

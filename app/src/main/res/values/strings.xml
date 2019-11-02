@@ -12,4 +12,8 @@
     <string name="create">Create</string>
     <string name="account">Account</string>
     <string name="home">Home</string>
+
+    <string name="text_success">Success</string>
+    <string name="text_ok">OK</string>
+    <string name="text_error">Error</string>
 </resources>

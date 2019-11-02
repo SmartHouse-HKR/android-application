@@ -1,7 +1,6 @@
 package se.hkr.smarthouse.ui.auth
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +9,7 @@ import kotlinx.android.synthetic.main.fragment_login.input_email
 import kotlinx.android.synthetic.main.fragment_login.input_password
 import kotlinx.android.synthetic.main.fragment_login.login_button
 import se.hkr.smarthouse.R
-import se.hkr.smarthouse.models.AccountCredentials
+import se.hkr.smarthouse.ui.auth.state.AuthStateEvent
 import se.hkr.smarthouse.ui.auth.state.LoginFields
 
 class LoginFragment : BaseAuthFragment() {
@@ -23,18 +22,9 @@ class LoginFragment : BaseAuthFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "LoginFragment: ${viewModel.hashCode()}")
         subscribeObservers()
         login_button.setOnClickListener {
-            Log.d(TAG, "Login button pressed")
-            // Temporary test
-            viewModel.setAccountCredentials(
-                AccountCredentials(
-                    pk = 1,
-                    email = "asdf",
-                    password = "123"
-                )
-            )
+            login()
         }
     }
 
@@ -49,6 +39,15 @@ class LoginFragment : BaseAuthFragment() {
                 }
             }
         })
+    }
+
+    private fun login() {
+        viewModel.setStateEvent(
+            AuthStateEvent.LoginAttemptEvent(
+                input_email.text.toString(),
+                input_password.text.toString()
+            )
+        )
     }
 
     override fun onDestroyView() {

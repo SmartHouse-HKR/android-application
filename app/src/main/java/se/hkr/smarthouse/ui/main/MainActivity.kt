@@ -4,14 +4,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.Observer
+import kotlinx.android.synthetic.main.activity_main.progress_bar
 import kotlinx.android.synthetic.main.activity_main.tool_bar
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.ui.BaseActivity
 import se.hkr.smarthouse.ui.auth.AuthActivity
+import se.hkr.smarthouse.util.setVisibility
 
 class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(TAG, "Started Main Activity")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         tool_bar.setOnClickListener {
@@ -22,9 +23,11 @@ class MainActivity : BaseActivity() {
     }
 
     private fun subscribeObservers() {
-        sessionManager.cachedCredentials.observe(this, Observer { accountCredentials ->
-            if (accountCredentials == null
-                || accountCredentials.pk == -1
+        sessionManager.cachedToken.observe(this, Observer { authToken ->
+            Log.d(TAG, "MainActivity: Account credentials observed change: $authToken")
+            if (authToken == null
+                || authToken.account_pk == -1
+                || authToken.token == null
             ) {
                 navAuthActivity()
             }
@@ -32,8 +35,13 @@ class MainActivity : BaseActivity() {
     }
 
     private fun navAuthActivity() {
+        Log.d(TAG, "MainActivity: navigating back to AuthActivity")
         val intent = Intent(this, AuthActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    override fun displayProgressBar(boolean: Boolean) {
+        progress_bar.setVisibility(boolean)
     }
 }

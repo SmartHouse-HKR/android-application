@@ -2,7 +2,7 @@ package se.hkr.smarthouse
 
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
-import se.hkr.androidjetpack.di.DaggerAppComponent
+import se.hkr.smarthouse.di.DaggerAppComponent
 
 class BaseApplication : DaggerApplication() {
     override fun applicationInjector(): AndroidInjector<out DaggerApplication>/*?*/ {
