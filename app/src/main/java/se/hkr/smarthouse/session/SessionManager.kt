@@ -6,13 +6,11 @@ import android.net.ConnectivityManager
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import se.hkr.smarthouse.models.AuthToken
-import se.hkr.smarthouse.persistence.AuthTokenDao
+import se.hkr.smarthouse.models.AccountCredentials
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,19 +18,14 @@ import javax.inject.Singleton
 class SessionManager
 @Inject
 constructor(
-    val authTokenDao: AuthTokenDao,
     val application: Application
 ) {
     private val TAG: String = "AppDebug"
-    private val _cachedToken = MutableLiveData<AuthToken>()
-    val cachedToken: LiveData<AuthToken>
+    private val _cachedToken = MutableLiveData<AccountCredentials>()
+    val cachedToken: LiveData<AccountCredentials>
         get() = _cachedToken
 
-    fun login(newValue: AuthToken) {
-        setValue(newValue)
-    }
-
-    fun setValue(newValue: AuthToken?) {
+    fun setValue(newValue: AccountCredentials?) {
         GlobalScope.launch(Main) {
             if (_cachedToken.value != newValue) {
                 _cachedToken.value = newValue
@@ -40,28 +33,19 @@ constructor(
         }
     }
 
+    fun login(newValue: AccountCredentials) {
+        setValue(newValue)
+    }
+
     fun logout() {
         Log.d(TAG, "Logging out...")
         CoroutineScope(Main).launch {
             var errorMessage: String? = null
-            try {
-                _cachedToken.value!!.account_pk?.let {
-                    authTokenDao.nullifyToken(it)
-                    Log.d(TAG, "nullified token inside room db")
-                } ?: throw CancellationException("Token Error. Logging out user")
-            } catch (e: CancellationException) {
-                Log.e(TAG, "logout: ${e.message}")
-                errorMessage = e.message
-            } catch (e: Exception) {
-                Log.e(TAG, "logout: ${e.message}")
-                errorMessage = errorMessage + "\n" + e.message
-            } finally {
-                errorMessage?.let {
-                    Log.e(TAG, "logout: $errorMessage")
-                }
-                Log.d(TAG, "Logout: finally was called")
-                setValue(null)
+            errorMessage?.let {
+                Log.e(TAG, "logout: $errorMessage")
             }
+            Log.d(TAG, "Logout: finally was called")
+            setValue(null)
         }
     }
 

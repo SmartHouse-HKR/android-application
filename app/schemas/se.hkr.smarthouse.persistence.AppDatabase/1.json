@@ -2,83 +2,57 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "24433683c0bbf42d595b902463c06f3a",
+    "identityHash": "63807b8ece340b539ad424960f177ebd",
     "entities": [
       {
-        "tableName": "account_properties",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pk` INTEGER NOT NULL, `email` TEXT NOT NULL, `password` TEXT NOT NULL, PRIMARY KEY(`pk`))",
-        "fields": [
-          {
-            "fieldPath": "pk",
-            "columnName": "pk",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "email",
-            "columnName": "email",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "password",
-            "columnName": "password",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "pk"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "auth_token",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account_pk` INTEGER, `token` TEXT, PRIMARY KEY(`account_pk`), FOREIGN KEY(`account_pk`) REFERENCES `account_properties`(`pk`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "tableName": "account_credential",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`account_pk` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `username` TEXT, `password` TEXT, `hostUrl` TEXT, `clientId` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "account_pk",
             "columnName": "account_pk",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "token",
-            "columnName": "token",
+            "fieldPath": "password",
+            "columnName": "password",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "hostUrl",
+            "columnName": "hostUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "clientId",
+            "columnName": "clientId",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
             "account_pk"
           ],
-          "autoGenerate": false
+          "autoGenerate": true
         },
         "indices": [],
-        "foreignKeys": [
-          {
-            "table": "account_properties",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "account_pk"
-            ],
-            "referencedColumns": [
-              "pk"
-            ]
-          }
-        ]
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '24433683c0bbf42d595b902463c06f3a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '63807b8ece340b539ad424960f177ebd')"
     ]
   }
 }

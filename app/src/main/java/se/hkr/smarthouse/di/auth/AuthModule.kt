@@ -4,8 +4,7 @@ import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
 import se.hkr.smarthouse.api.auth.OpenApiAuthService
-import se.hkr.smarthouse.persistence.AccountPropertiesDao
-import se.hkr.smarthouse.persistence.AuthTokenDao
+import se.hkr.smarthouse.persistence.AccountCredentialsDao
 import se.hkr.smarthouse.repository.auth.AuthRepository
 import se.hkr.smarthouse.session.SessionManager
 
@@ -23,14 +22,12 @@ class AuthModule {
     @Provides
     fun provideAuthRepository(
         sessionManager: SessionManager,
-        authTokenDao: AuthTokenDao,
-        accountPropertiesDao: AccountPropertiesDao,
+        accountCredentialsDao: AccountCredentialsDao,
         openApiAuthService: OpenApiAuthService
     ): AuthRepository {
         return AuthRepository(
             sessionManager = sessionManager,
-            authTokenDao = authTokenDao,
-            accountPropertiesDao = accountPropertiesDao,
+            accountCredentialsDao = accountCredentialsDao,
             openApiAuthService = openApiAuthService
         )
     }

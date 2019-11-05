@@ -1,7 +1,7 @@
 package se.hkr.smarthouse.ui.auth
 
 import androidx.lifecycle.LiveData
-import se.hkr.smarthouse.models.AuthToken
+import se.hkr.smarthouse.models.AccountCredentials
 import se.hkr.smarthouse.repository.auth.AuthRepository
 import se.hkr.smarthouse.ui.BaseViewModel
 import se.hkr.smarthouse.ui.DataState
@@ -62,12 +62,12 @@ constructor(
         _viewState.value = newViewState
     }
 
-    fun setAuthToken(authToken: AuthToken) {
+    fun setAuthToken(accountCredentials: AccountCredentials) {
         val newViewState = getCurrentViewStateOrNew()
-        if (newViewState.authToken == authToken) {
+        if (newViewState.accountCredentials == accountCredentials) {
             return
         }
-        newViewState.authToken = authToken
+        newViewState.accountCredentials = accountCredentials
         _viewState.value = newViewState
     }
 

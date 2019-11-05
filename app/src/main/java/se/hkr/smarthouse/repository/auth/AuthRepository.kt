@@ -6,9 +6,8 @@ import kotlinx.coroutines.Job
 import se.hkr.smarthouse.api.auth.OpenApiAuthService
 import se.hkr.smarthouse.api.auth.network_responses.LoginResponse
 import se.hkr.smarthouse.api.auth.network_responses.RegistrationResponse
-import se.hkr.smarthouse.models.AuthToken
-import se.hkr.smarthouse.persistence.AccountPropertiesDao
-import se.hkr.smarthouse.persistence.AuthTokenDao
+import se.hkr.smarthouse.models.AccountCredentials
+import se.hkr.smarthouse.persistence.AccountCredentialsDao
 import se.hkr.smarthouse.repository.NetworkBoundResource
 import se.hkr.smarthouse.session.SessionManager
 import se.hkr.smarthouse.ui.DataState
@@ -25,8 +24,7 @@ import javax.inject.Inject
 class AuthRepository
 @Inject
 constructor(
-    val authTokenDao: AuthTokenDao,
-    val accountPropertiesDao: AccountPropertiesDao,
+    val accountCredentialsDao: AccountCredentialsDao,
     val openApiAuthService: OpenApiAuthService,
     val sessionManager: SessionManager
 ) {
@@ -56,7 +54,10 @@ constructor(
                 onCompleteJob(
                     DataState.data(
                         data = AuthViewState(
-                            authToken = AuthToken(response.body.pk, response.body.token)
+                            accountCredentials = AccountCredentials(
+                                response.body.pk,
+                                response.body.token
+                            )
                         )
                     )
                 )
@@ -101,7 +102,7 @@ constructor(
                 onCompleteJob(
                     DataState.data(
                         data = AuthViewState(
-                            authToken = AuthToken(
+                            accountCredentials = AccountCredentials(
                                 response.body.pk,
                                 response.body.token
                             )

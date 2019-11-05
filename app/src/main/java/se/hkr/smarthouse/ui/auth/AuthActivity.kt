@@ -36,7 +36,7 @@ class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener 
             dataState.data?.let { data ->
                 data.data?.let { dataEvent ->
                     dataEvent.getContentIfNotHandled()?.let { eventContent ->
-                        eventContent.authToken?.let { authToken ->
+                        eventContent.accountCredentials?.let { authToken ->
                             Log.d(TAG, "AuthActivity: DataState: $eventContent")
                             viewModel.setAuthToken(authToken)
                         }
@@ -45,7 +45,7 @@ class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener 
             }
         })
         viewModel.viewState.observe(this, Observer { authViewState ->
-            authViewState.authToken?.let { authToken ->
+            authViewState.accountCredentials?.let { authToken ->
                 sessionManager.login(authToken)
             }
         })

@@ -1,11 +1,11 @@
 package se.hkr.smarthouse.ui.auth.state
 
-import se.hkr.smarthouse.models.AuthToken
+import se.hkr.smarthouse.models.AccountCredentials
 
 data class AuthViewState(
     var registrationFields: RegistrationFields? = RegistrationFields(),
     var loginFields: LoginFields? = LoginFields(),
-    var authToken: AuthToken? = null
+    var accountCredentials: AccountCredentials? = null
 )
 
 data class RegistrationFields(
