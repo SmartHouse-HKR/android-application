@@ -7,7 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import kotlinx.android.synthetic.main.activity_auth.progress_bar
+import kotlinx.android.synthetic.main.activity_auth.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.ui.BaseActivity
 import se.hkr.smarthouse.ui.auth.state.LoginFields
