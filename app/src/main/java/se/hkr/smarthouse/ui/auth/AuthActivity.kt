@@ -12,6 +12,7 @@ import se.hkr.smarthouse.R
 import se.hkr.smarthouse.ui.BaseActivity
 import se.hkr.smarthouse.ui.auth.state.LoginFields
 import se.hkr.smarthouse.ui.main.MainActivity
+import se.hkr.smarthouse.util.displayToast
 import se.hkr.smarthouse.util.setVisibility
 import se.hkr.smarthouse.viewmodels.ViewModelProviderFactory
 import javax.inject.Inject
@@ -32,29 +33,33 @@ class AuthActivity : BaseActivity(), NavController.OnDestinationChangedListener 
 
     private fun subscribeObservers() {
         viewModel.dataState.observe(this, Observer { dataState ->
+            Log.d(TAG, "AuthActivity: dataState changed: $dataState")
             onDataStateChange(dataState)
             dataState.data?.let { data ->
                 data.data?.let { dataEvent ->
                     dataEvent.getContentIfNotHandled()?.let { eventContent ->
-                        eventContent.authToken?.let { authToken ->
-                            Log.d(TAG, "AuthActivity: DataState: $eventContent")
-                            viewModel.setAuthToken(authToken)
+                        eventContent.accountCredentials?.let { accountCredentials ->
+                            Log.d(TAG, "AuthActivity: new accountCredentials: $accountCredentials")
+                            viewModel.setAccountCredentials(accountCredentials)
                         }
                     }
                 }
             }
         })
         viewModel.viewState.observe(this, Observer { authViewState ->
-            authViewState.authToken?.let { authToken ->
-                sessionManager.login(authToken)
+            Log.d(TAG, "AuthActivity: viewState changed to: $authViewState")
+            authViewState.accountCredentials?.let { accountCredentials ->
+                sessionManager.login(accountCredentials)
             }
         })
-        sessionManager.cachedToken.observe(this, Observer { authToken ->
-            if (authToken != null
-                && authToken.account_pk != -1
-                && authToken.token != null
+        sessionManager.cachedAccountCredentials.observe(this, Observer { accountCredentials ->
+            Log.d(TAG, "AuthActivity: cached acc cred $accountCredentials")
+            if (accountCredentials != null
+                && accountCredentials.account_pk != -1
+                && accountCredentials.hostUrl != null
             ) {
-                Log.d(TAG, "Navigating to main because: ${authToken}")
+                displayToast("Connected to: ${accountCredentials.hostUrl}")
+                Log.d(TAG, "Navigating to main because: $accountCredentials")
                 navMainActivity()
             }
         })

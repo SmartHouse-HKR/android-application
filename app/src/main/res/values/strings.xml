@@ -16,4 +16,5 @@
     <string name="text_success">Success</string>
     <string name="text_ok">OK</string>
     <string name="text_error">Error</string>
+    <string name="host_url">Host Url</string>
 </resources>

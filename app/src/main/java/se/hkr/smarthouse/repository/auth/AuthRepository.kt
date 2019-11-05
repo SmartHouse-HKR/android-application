@@ -3,12 +3,10 @@ package se.hkr.smarthouse.repository.auth
 import android.util.Log
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Job
-import se.hkr.smarthouse.api.auth.OpenApiAuthService
-import se.hkr.smarthouse.api.auth.network_responses.LoginResponse
-import se.hkr.smarthouse.api.auth.network_responses.RegistrationResponse
-import se.hkr.smarthouse.models.AuthToken
-import se.hkr.smarthouse.persistence.AccountPropertiesDao
-import se.hkr.smarthouse.persistence.AuthTokenDao
+import se.hkr.smarthouse.models.AccountCredentials
+import se.hkr.smarthouse.mqtt.MqttConnection
+import se.hkr.smarthouse.mqtt.responses.MqttResponse
+import se.hkr.smarthouse.persistence.AccountCredentialsDao
 import se.hkr.smarthouse.repository.NetworkBoundResource
 import se.hkr.smarthouse.session.SessionManager
 import se.hkr.smarthouse.ui.DataState
@@ -16,102 +14,54 @@ import se.hkr.smarthouse.ui.Response
 import se.hkr.smarthouse.ui.ResponseType
 import se.hkr.smarthouse.ui.auth.state.AuthViewState
 import se.hkr.smarthouse.ui.auth.state.LoginFields
-import se.hkr.smarthouse.ui.auth.state.RegistrationFields
-import se.hkr.smarthouse.util.ApiSuccessResponse
-import se.hkr.smarthouse.util.ErrorHandling.Companion.GENERIC_AUTH_ERROR
-import se.hkr.smarthouse.util.GenericApiResponse
 import javax.inject.Inject
 
 class AuthRepository
 @Inject
 constructor(
-    val authTokenDao: AuthTokenDao,
-    val accountPropertiesDao: AccountPropertiesDao,
-    val openApiAuthService: OpenApiAuthService,
-    val sessionManager: SessionManager
+    val sessionManager: SessionManager,
+    val accountCredentialsDao: AccountCredentialsDao
 ) {
     val TAG = "AppDebug"
     private var repositoryJob: Job? = null
 
     fun attemptLogin(
-        email: String,
-        password: String
+        username: String,
+        password: String,
+        hostUrl: String
     ): LiveData<DataState<AuthViewState>> {
-        val loginFieldErrors = LoginFields(email, password).isValidForLogin()
+        val loginFieldErrors = LoginFields(username, password, hostUrl).isValidForLogin()
         if (loginFieldErrors != LoginFields.LoginError.none()) {
             return returnErrorResponse(loginFieldErrors, ResponseType.Dialog())
         }
-        return object : NetworkBoundResource<LoginResponse, AuthViewState>(
+        return object : NetworkBoundResource<MqttResponse, AuthViewState>(
             sessionManager.isConnectedToTheInternet()
         ) {
-            override suspend fun handleApiSuccessResponse(
-                response: ApiSuccessResponse<LoginResponse>
-            ) {
-                Log.d(TAG, "handleApiSuccessResponse: $response")
-                // Incorrect login credentials will still respond successfully
-                if (response.body.response == GENERIC_AUTH_ERROR) {
-                    return onErrorReturn(response.body.errorMessage, true, false)
-                }
-                // Here they are correctly authenticated
-                onCompleteJob(
-                    DataState.data(
-                        data = AuthViewState(
-                            authToken = AuthToken(response.body.pk, response.body.token)
-                        )
-                    )
-                )
-            }
-
-            override fun createCall(): LiveData<GenericApiResponse<LoginResponse>> {
-                return openApiAuthService.login(email = email, password = password)
-            }
-
-            override fun setJob(job: Job) {
-                cancelActiveJobs()
-                repositoryJob = job
-            }
-        }.asLiveData()
-    }
-
-    fun attemptRegistration(
-        email: String,
-        username: String,
-        password: String,
-        confirmPassword: String
-    ): LiveData<DataState<AuthViewState>> {
-        val registerFieldErrors =
-            RegistrationFields(
-                email,
-                username,
-                password,
-                confirmPassword
-            ).isValidForRegistration()
-        if (registerFieldErrors != RegistrationFields.RegistrationError.none()) {
-            return returnErrorResponse(registerFieldErrors, ResponseType.Dialog())
-        }
-        return object : NetworkBoundResource<RegistrationResponse, AuthViewState>(
-            sessionManager.isConnectedToTheInternet()
-        ) {
-            override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<RegistrationResponse>) {
-                Log.d(TAG, "handleApiSuccessResponse: $response")
-                // If already exists, we get the generic auth error
-                if (response.body.response == GENERIC_AUTH_ERROR) {
-                    return onErrorReturn(response.body.errorMessage, true, false)
+            override fun handleResponse(response: MqttResponse) {
+                Log.d(TAG, "handle response: $response")
+                if (!response.successful) {
+                    return onErrorReturn("Connection Failed", true, false)
                 }
                 onCompleteJob(
                     DataState.data(
                         data = AuthViewState(
-                            authToken = AuthToken(
-                                response.body.pk,
-                                response.body.token
+                            accountCredentials = AccountCredentials(
+                                account_pk = 1,
+                                username = username,
+                                password = password,
+                                hostUrl = hostUrl
                             )
                         )
                     )
                 )
             }
 
-            override fun createCall(): LiveData<GenericApiResponse<RegistrationResponse>> {
-                return openApiAuthService.register(email, username, password, confirmPassword)
+            override fun createCall(): LiveData<MqttResponse> {
+                return MqttConnection.connect(
+                    username = username,
+                    password = password,
+                    hostUrl = hostUrl
+                )
             }
 
             override fun setJob(job: Job) {

@@ -5,8 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import kotlinx.android.synthetic.main.fragment_login.input_email
+import kotlinx.android.synthetic.main.fragment_login.input_host_url
 import kotlinx.android.synthetic.main.fragment_login.input_password
+import kotlinx.android.synthetic.main.fragment_login.input_username
 import kotlinx.android.synthetic.main.fragment_login.login_button
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.ui.auth.state.AuthStateEvent
@@ -31,11 +32,14 @@ class LoginFragment : BaseAuthFragment() {
     private fun subscribeObservers() {
         viewModel.viewState.observe(viewLifecycleOwner, Observer { authViewState ->
             authViewState.loginFields?.let { loginFields ->
-                loginFields.login_email?.let { emailText ->
-                    input_email.setText(emailText)
+                loginFields.login_username?.let { emailText ->
+                    input_username.setText(emailText)
                 }
                 loginFields.login_password?.let { passwordText ->
                     input_password.setText(passwordText)
+                }
+                loginFields.login_host_url?.let { hostUrlText ->
+                    input_host_url.setText(hostUrlText)
                 }
             }
         })
@@ -44,8 +48,9 @@ class LoginFragment : BaseAuthFragment() {
     private fun login() {
         viewModel.setStateEvent(
             AuthStateEvent.LoginAttemptEvent(
-                input_email.text.toString(),
-                input_password.text.toString()
+                input_username.text.toString(),
+                input_password.text.toString(),
+                input_host_url.text.toString()
             )
         )
     }
@@ -55,8 +60,9 @@ class LoginFragment : BaseAuthFragment() {
         // Update ViewModel on fragment destroy to remember fields
         viewModel.setLoginFields(
             LoginFields(
-                login_email = input_email.text.toString(),
-                login_password = input_password.text.toString()
+                login_username = input_username.text.toString(),
+                login_password = input_password.text.toString(),
+                login_host_url = input_host_url.text.toString()
             )
         )
     }

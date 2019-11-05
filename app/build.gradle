@@ -42,6 +42,10 @@ android {
     androidExtensions {
         experimental = true
     }
+    packagingOptions {
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/io.netty.versions.properties'
+    }
 }
 
 dependencies {
@@ -65,10 +69,10 @@ dependencies {
     // https://stackoverflow.com/questions/52776716/androidjunit4-class-is-deprecated-how-to-use-androidx-test-ext-junit-runners-an/52776938
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
 
-    // Retrofit2
-    def retrofit2_version = "2.6.0"
-    implementation "com.squareup.retrofit2:retrofit:$retrofit2_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit2_version"
+    // Mqtt
+    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.1"
+    implementation "com.hivemq:hivemq-extension-archetype:4.2.0"
+    implementation "com.hivemq:hivemq-mqtt-client:1.1.2"
 
     // Lifecycle Components (ViewModel, LiveData and ReactiveStreams)
     def lifecycle_version = "2.2.0-beta01"
@@ -87,6 +91,7 @@ dependencies {
     def room_version = "2.2.0-rc01"
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
+
     // Kotlin Extensions and Coroutines support for Room
     implementation "androidx.room:room-ktx:$room_version"
 
@@ -114,10 +119,6 @@ dependencies {
     // Material dialogs
     def material_dialogs_version = "3.1.0"
     implementation "com.afollestad.material-dialogs:core:$material_dialogs_version"
-
-    // Leak Canary
-    def leak_canary_version = "2.0-alpha-3"
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leak_canary_version"
 
     // Card view
     def cardview_version = "1.0.0"
