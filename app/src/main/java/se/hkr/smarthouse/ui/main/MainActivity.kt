@@ -23,11 +23,11 @@ class MainActivity : BaseActivity() {
     }
 
     private fun subscribeObservers() {
-        sessionManager.cachedToken.observe(this, Observer { authToken ->
-            Log.d(TAG, "MainActivity: Account credentials observed change: $authToken")
-            if (authToken == null
-                || authToken.account_pk == -1
-                || authToken.token == null
+        sessionManager.cachedAccountCredentials.observe(this, Observer { accountCredentials ->
+            Log.d(TAG, "MainActivity: Account credentials observed change: $accountCredentials")
+            if (accountCredentials == null
+                || accountCredentials.account_pk == -1
+                || accountCredentials.hostUrl == null
             ) {
                 navAuthActivity()
             }

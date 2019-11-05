@@ -8,8 +8,6 @@ import se.hkr.smarthouse.ui.DataState
 import se.hkr.smarthouse.ui.auth.state.AuthStateEvent
 import se.hkr.smarthouse.ui.auth.state.AuthViewState
 import se.hkr.smarthouse.ui.auth.state.LoginFields
-import se.hkr.smarthouse.ui.auth.state.RegistrationFields
-import se.hkr.smarthouse.util.AbsentLiveData
 import javax.inject.Inject
 
 class AuthViewModel
@@ -22,35 +20,16 @@ constructor(
         when (stateEvent) {
             is AuthStateEvent.LoginAttemptEvent -> {
                 return authRepository.attemptLogin(
-                    stateEvent.email,
-                    stateEvent.password
-                )
-            }
-            is AuthStateEvent.RegisterAttemptEvent -> {
-                return authRepository.attemptRegistration(
-                    stateEvent.email,
                     stateEvent.username,
                     stateEvent.password,
-                    stateEvent.confirm_password
+                    stateEvent.hostUrl
                 )
-            }
-            is AuthStateEvent.CheckPreviousAuthEvent -> {
-                return AbsentLiveData.create()
             }
         }
     }
 
     override fun initNewViewState(): AuthViewState {
         return AuthViewState()
-    }
-
-    fun setRegistrationFields(registrationFields: RegistrationFields) {
-        val newViewState = getCurrentViewStateOrNew()
-        if (newViewState.registrationFields == registrationFields) {
-            return
-        }
-        newViewState.registrationFields = registrationFields
-        _viewState.value = newViewState
     }
 
     fun setLoginFields(loginFields: LoginFields) {
@@ -62,7 +41,7 @@ constructor(
         _viewState.value = newViewState
     }
 
-    fun setAuthToken(accountCredentials: AccountCredentials) {
+    fun setAccountCredentials(accountCredentials: AccountCredentials) {
         val newViewState = getCurrentViewStateOrNew()
         if (newViewState.accountCredentials == accountCredentials) {
             return

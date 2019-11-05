@@ -2,7 +2,8 @@
   <dictionary name="STGA0006">
     <words>
       <w>coroutine</w>
-      <w>gson</w>
+      <w>coroutines</w>
+      <w>mqtt</w>
       <w>smarthouse</w>
       <w>viewmodel</w>
     </words>

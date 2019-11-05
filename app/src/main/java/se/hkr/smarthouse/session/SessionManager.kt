@@ -6,7 +6,6 @@ import android.net.ConnectivityManager
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -21,32 +20,26 @@ constructor(
     val application: Application
 ) {
     private val TAG: String = "AppDebug"
-    private val _cachedToken = MutableLiveData<AccountCredentials>()
-    val cachedToken: LiveData<AccountCredentials>
-        get() = _cachedToken
+    private val _cachedAccountCredentials = MutableLiveData<AccountCredentials>()
+    val cachedAccountCredentials: LiveData<AccountCredentials>
+        get() = _cachedAccountCredentials
 
     fun setValue(newValue: AccountCredentials?) {
         GlobalScope.launch(Main) {
-            if (_cachedToken.value != newValue) {
-                _cachedToken.value = newValue
+            if (_cachedAccountCredentials.value != newValue) {
+                _cachedAccountCredentials.value = newValue
             }
         }
     }
 
-    fun login(newValue: AccountCredentials) {
-        setValue(newValue)
+    fun login(accountCredentials: AccountCredentials) {
+        Log.d(TAG, "Logging in: $accountCredentials")
+        setValue(accountCredentials)
     }
 
     fun logout() {
-        Log.d(TAG, "Logging out...")
-        CoroutineScope(Main).launch {
-            var errorMessage: String? = null
-            errorMessage?.let {
-                Log.e(TAG, "logout: $errorMessage")
-            }
-            Log.d(TAG, "Logout: finally was called")
-            setValue(null)
-        }
+        Log.d(TAG, "Logging out from: ${cachedAccountCredentials.value}")
+        setValue(null)
     }
 
     fun isConnectedToTheInternet(): Boolean {

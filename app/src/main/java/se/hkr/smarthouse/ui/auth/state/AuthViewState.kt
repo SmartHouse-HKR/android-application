@@ -3,64 +3,19 @@ package se.hkr.smarthouse.ui.auth.state
 import se.hkr.smarthouse.models.AccountCredentials
 
 data class AuthViewState(
-    var registrationFields: RegistrationFields? = RegistrationFields(),
     var loginFields: LoginFields? = LoginFields(),
     var accountCredentials: AccountCredentials? = null
 )
 
-data class RegistrationFields(
-    var registration_email: String? = null,
-    var registration_username: String? = null,
-    var registration_password: String? = null,
-    var registration_confirm_password: String? = null
-) {
-    class RegistrationError {
-        companion object {
-            fun mustFillAllFields(): String {
-                return "All fields are required."
-            }
-
-            fun passwordsDoNotMatch(): String {
-                return "Passwords must match."
-            }
-
-            fun none(): String {
-                return "None."
-            }
-        }
-    }
-
-    fun isValidForRegistration(): String {
-        if (registration_email.isNullOrEmpty()
-            || registration_username.isNullOrEmpty()
-            || registration_password.isNullOrEmpty()
-            || registration_confirm_password.isNullOrEmpty()
-        ) {
-            return RegistrationError.mustFillAllFields()
-        }
-        if (!registration_password.equals(registration_confirm_password)) {
-            return RegistrationError.passwordsDoNotMatch()
-        }
-        return RegistrationError.none()
-    }
-
-    override fun toString(): String {
-        return "RegistrationState(" +
-                "email=$registration_email, " +
-                "username=$registration_username, " +
-                "password=$registration_password, " +
-                "confirm password=$registration_confirm_password)"
-    }
-}
-
 data class LoginFields(
-    var login_email: String? = null,
-    var login_password: String? = null
+    var login_username: String? = null,
+    var login_password: String? = null,
+    var login_host_url: String? = null
 ) {
     class LoginError {
         companion object {
             fun mustFillAllFields(): String {
-                return "You can't login without an email and password."
+                return "You can't login without an username and password."
             }
 
             fun none(): String {
@@ -70,8 +25,9 @@ data class LoginFields(
     }
 
     fun isValidForLogin(): String {
-        if (login_email.isNullOrEmpty()
+        if (login_username.isNullOrEmpty()
             || login_password.isNullOrEmpty()
+            || login_host_url.isNullOrEmpty()
         ) {
             return LoginError.mustFillAllFields()
         }
@@ -79,6 +35,6 @@ data class LoginFields(
     }
 
     override fun toString(): String {
-        return "LoginState(email=$login_email, password=$login_password)"
+        return "LoginFields(login_username=$login_username, login_password=$login_password, login_host_url=$login_host_url)"
     }
-} 
+}

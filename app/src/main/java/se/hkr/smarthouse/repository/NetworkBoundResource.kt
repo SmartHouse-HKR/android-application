@@ -17,16 +17,12 @@ import kotlinx.coroutines.withContext
 import se.hkr.smarthouse.ui.DataState
 import se.hkr.smarthouse.ui.Response
 import se.hkr.smarthouse.ui.ResponseType
-import se.hkr.smarthouse.util.ApiEmptyResponse
-import se.hkr.smarthouse.util.ApiErrorResponse
-import se.hkr.smarthouse.util.ApiSuccessResponse
 import se.hkr.smarthouse.util.Constants.Companion.NETWORK_TIMEOUT
 import se.hkr.smarthouse.util.Constants.Companion.TESTING_NETWORK_DELAY
 import se.hkr.smarthouse.util.ErrorHandling
 import se.hkr.smarthouse.util.ErrorHandling.Companion.ERROR_CHECK_NETWORK_CONNECTION
 import se.hkr.smarthouse.util.ErrorHandling.Companion.ERROR_UNKNOWN
 import se.hkr.smarthouse.util.ErrorHandling.Companion.UNABLE_TO_RESOLVE_HOST
-import se.hkr.smarthouse.util.GenericApiResponse
 import java.util.concurrent.CancellationException
 
 /**
@@ -69,28 +65,6 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
         }
     }
 
-    private fun setValue(dataState: DataState<ViewStateType>) {
-        result.value = dataState
-    }
-
-    fun asLiveData() = result as LiveData<DataState<ViewStateType>>
-
-    suspend fun handleNetworkCall(response: GenericApiResponse<ResponseObject>?) {
-        when (response) {
-            is ApiSuccessResponse -> {
-                handleApiSuccessResponse(response)
-            }
-            is ApiErrorResponse -> {
-                Log.e(TAG, "NetworkBoundResource: ${response.errorMessage}")
-                onErrorReturn(response.errorMessage, true, false)
-            }
-            is ApiEmptyResponse -> {
-                Log.e(TAG, "NetworkBoundResource: Request returned Nothing (HTTP 204)")
-                onErrorReturn("HTTP 204. Returned Nothing", true, false)
-            }
-        }
-    }
-
     @UseExperimental(InternalCoroutinesApi::class)
     private fun initNewJob(): Job {
         Log.d(TAG, "initNewJob: Called...")
@@ -115,6 +89,16 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
         )
         coroutineScope = CoroutineScope(IO + job)
         return job
+    }
+
+    private fun setValue(dataState: DataState<ViewStateType>) {
+        result.value = dataState
+    }
+
+    fun asLiveData() = result as LiveData<DataState<ViewStateType>>
+
+    suspend fun handleNetworkCall(response: ResponseObject) {
+        handleResponse(response)
     }
 
     fun onCompleteJob(dataState: DataState<ViewStateType>) {
@@ -144,7 +128,6 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
         if (useDialog) {
             responseType = ResponseType.Dialog()
         }
-
         onCompleteJob(
             DataState.error(
                 response = Response(
@@ -155,9 +138,9 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
         )
     }
 
-    abstract suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<ResponseObject>)
+    abstract fun handleResponse(response: ResponseObject)
 
-    abstract fun createCall(): LiveData<GenericApiResponse<ResponseObject>>
+    abstract fun createCall(): LiveData<ResponseObject>
 
     abstract fun setJob(job: Job)
 }
