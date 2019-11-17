@@ -17,4 +17,6 @@
     <string name="text_ok">OK</string>
     <string name="text_error">Error</string>
     <string name="host_url">Host Url</string>
+    <string name="topic">Topic</string>
+    <string name="subscribe">Subscribe</string>
 </resources>

@@ -6,6 +6,10 @@ import se.hkr.smarthouse.di.auth.AuthFragmentsBuildersModule
 import se.hkr.smarthouse.di.auth.AuthModule
 import se.hkr.smarthouse.di.auth.AuthScope
 import se.hkr.smarthouse.di.auth.AuthViewModelModule
+import se.hkr.smarthouse.di.main.MainFragmentsBuildersModule
+import se.hkr.smarthouse.di.main.MainModule
+import se.hkr.smarthouse.di.main.MainScope
+import se.hkr.smarthouse.di.main.MainViewModelModule
 import se.hkr.smarthouse.ui.auth.AuthActivity
 import se.hkr.smarthouse.ui.main.MainActivity
 
@@ -22,6 +26,14 @@ abstract class ActivityBuildersModule {
     )
     abstract fun contributeAuthActivity(): AuthActivity
 
-    @ContributesAndroidInjector
+    // Creating the MainScope
+    @MainScope
+    @ContributesAndroidInjector(
+        modules = [
+            MainModule::class,
+            MainFragmentsBuildersModule::class,
+            MainViewModelModule::class
+        ]
+    )
     abstract fun contributeMainActivity(): MainActivity
 }

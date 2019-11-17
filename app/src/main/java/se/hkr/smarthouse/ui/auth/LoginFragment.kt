@@ -5,10 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import kotlinx.android.synthetic.main.fragment_login.input_host_url
-import kotlinx.android.synthetic.main.fragment_login.input_password
-import kotlinx.android.synthetic.main.fragment_login.input_username
-import kotlinx.android.synthetic.main.fragment_login.login_button
+import kotlinx.android.synthetic.main.fragment_login.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.ui.auth.state.AuthStateEvent
 import se.hkr.smarthouse.ui.auth.state.LoginFields

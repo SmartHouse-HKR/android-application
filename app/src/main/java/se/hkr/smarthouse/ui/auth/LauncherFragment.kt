@@ -5,10 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import kotlinx.android.synthetic.main.fragment_launcher.focusable_view
-import kotlinx.android.synthetic.main.fragment_launcher.forgot_password
-import kotlinx.android.synthetic.main.fragment_launcher.login
-import kotlinx.android.synthetic.main.fragment_launcher.register
+import kotlinx.android.synthetic.main.fragment_launcher.*
 import se.hkr.smarthouse.R
 
 class LauncherFragment : BaseAuthFragment() {
