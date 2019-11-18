@@ -32,8 +32,8 @@ class MainActivity : BaseActivity() {
         supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fragment_container,
-                HouseFragment(),
-                "HouseFragment"
+                MainFragment(),
+                "MainFragment"
             ).commit()
     }
 

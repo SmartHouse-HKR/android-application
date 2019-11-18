@@ -1,10 +1,37 @@
 <resources>
 
-    <style name="AppTheme"
-        parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="slider_yellow" parent="Widget.MaterialComponents.Slider">
+        <item name="activeTrackColor">#FFFF00</item>
+        <item name="inactiveTrackColor">#FFFF00</item>
+        <item name="thumbColor">#FFFF00</item>
+        <item name="android:colorPrimary">#FFFF00</item>
+    </style>
+
+    <style name="slider_red" parent="Widget.MaterialComponents.Slider">
+        <item name="activeTrackColor">#FF0000</item>
+        <item name="inactiveTrackColor">#FF0000</item>
+        <item name="thumbColor">#FF0000</item>
+        <item name="android:colorPrimary">#FF0000</item>
+    </style>
+
+    <style name="slider_green" parent="Widget.MaterialComponents.Slider">
+        <item name="activeTrackColor">#00FF00</item>
+        <item name="inactiveTrackColor">#00FF00</item>
+        <item name="thumbColor">#00FF00</item>
+        <item name="android:colorPrimary">#00FF00</item>
+    </style>
+
+    <style name="slider_blue" parent="Widget.MaterialComponents.Slider">
+        <item name="activeTrackColor">#0000FF</item>
+        <item name="inactiveTrackColor">#0000FF</item>
+        <item name="thumbColor">#0000FF</item>
+        <item name="android:colorPrimary">#0000FF</item>
     </style>
 
 </resources>
