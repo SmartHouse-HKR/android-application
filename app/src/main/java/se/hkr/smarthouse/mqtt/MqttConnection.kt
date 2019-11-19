@@ -8,7 +8,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import se.hkr.smarthouse.mqtt.responses.MqttResponse
-import java.util.UUID
+import java.util.*
 
 object MqttConnection {
     val TAG: String = "AppDebug"
@@ -21,7 +21,7 @@ object MqttConnection {
     ): LiveData<MqttResponse> {
         val liveData = MutableLiveData<MqttResponse>()
         try {
-            Log.d(TAG, "MqttConnection: publishing: topic: $topic, message: $message, qos: $qos")
+            Log.d(TAG, "MqttConnection: publishing: topic: $topic, deviceList: $message, qos: $qos")
             val mqttMessage = MqttMessage(message.toByteArray())
             mqttMessage.qos = qos
             mqttClient.publish(topic, mqttMessage)

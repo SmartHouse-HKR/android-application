@@ -1,14 +1,33 @@
 package se.hkr.smarthouse.ui.main.state
 
+import se.hkr.smarthouse.models.Device
+
 data class MainViewState(
     var subscribeFields: SubscribeFields? = SubscribeFields(),
     var publishFields: PublishFields? = PublishFields(),
-    var lampState: LampState? = LampState() // TODO add more (all?) states
+    var deviceFields: DeviceFields? = DeviceFields()
 )
 
-data class LampState(
-    var state: Boolean = false
-)
+data class DeviceFields(
+    var deviceList: MutableList<Device>? = null
+) {
+    fun addDevice(newDeviceList: MutableList<Device>) {
+        deviceList?.let {
+            deviceList?.forEach { oldDevice ->
+                newDeviceList.forEach { newDevice ->
+                    if (oldDevice.topic == newDevice.topic) {
+                        deviceList?.remove(oldDevice)
+                    }
+                }
+            }
+        }
+        if (deviceList == null) {
+            deviceList = newDeviceList
+            return
+        }
+        deviceList?.addAll(newDeviceList)
+    }
+}
 
 data class SubscribeFields(
     var topic: String? = null
@@ -19,7 +38,7 @@ data class SubscribeFields(
 data class PublishFields(
     var topic: String? = null,
     var message: String? = null,
-    var qos: Int = -1
+    var qos: Int = 0
 ) {
     class PublishError {
         companion object {

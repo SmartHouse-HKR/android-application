@@ -3,15 +3,15 @@ package se.hkr.smarthouse.repository.main
 import android.util.Log
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Job
+import se.hkr.smarthouse.models.Device
 import se.hkr.smarthouse.mqtt.MqttConnection
 import se.hkr.smarthouse.mqtt.responses.MqttResponse
-import se.hkr.smarthouse.persistence.AccountCredentialsDao
 import se.hkr.smarthouse.repository.NetworkBoundResource
 import se.hkr.smarthouse.session.SessionManager
 import se.hkr.smarthouse.ui.DataState
 import se.hkr.smarthouse.ui.Response
 import se.hkr.smarthouse.ui.ResponseType
-import se.hkr.smarthouse.ui.main.state.LampState
+import se.hkr.smarthouse.ui.main.state.DeviceFields
 import se.hkr.smarthouse.ui.main.state.MainViewState
 import se.hkr.smarthouse.ui.main.state.PublishFields
 import javax.inject.Inject
@@ -19,8 +19,7 @@ import javax.inject.Inject
 class MainRepository
 @Inject
 constructor(
-    val sessionManager: SessionManager,
-    val accountCredentialsDao: AccountCredentialsDao // Potentially don't need this here
+    val sessionManager: SessionManager
 ) {
     val TAG = "AppDebug"
     private var repositoryJob: Job? = null
@@ -30,9 +29,9 @@ constructor(
         message: String,
         qos: Int
     ): LiveData<DataState<MainViewState>> {
-        val loginFieldErrors = PublishFields(topic, message, qos).isValidForPublish()
-        if (loginFieldErrors != PublishFields.PublishError.none()) {
-            return returnErrorResponse(loginFieldErrors, ResponseType.Dialog())
+        val publishFieldErrors = PublishFields(topic, message, qos).isValidForPublish()
+        if (publishFieldErrors != PublishFields.PublishError.none()) {
+            return returnErrorResponse(publishFieldErrors, ResponseType.Dialog())
         }
         return object : NetworkBoundResource<MqttResponse, MainViewState>(
             sessionManager.isConnectedToTheInternet()
@@ -45,8 +44,10 @@ constructor(
                 onCompleteJob(
                     DataState.data(
                         data = MainViewState(
-                            lampState = LampState(
-                                state = message == "true" // TODO Change message to work differently?
+                            deviceFields = DeviceFields(
+                                deviceList = mutableListOf(
+                                    Device.builder(topic, message)
+                                )
                             )
                         )
                     )

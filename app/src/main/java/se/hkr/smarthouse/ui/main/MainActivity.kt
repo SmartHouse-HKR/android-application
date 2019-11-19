@@ -28,7 +28,6 @@ class MainActivity : BaseActivity() {
             sessionManager.logout()
         }
         subscribeObservers()
-        // TODO use nav for it instead of this simple inflation
         supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fragment_container,
@@ -44,9 +43,14 @@ class MainActivity : BaseActivity() {
             dataState.data?.let { data ->
                 data.data?.let { dataEvent ->
                     dataEvent.getContentIfNotHandled()?.let { eventContent ->
+                        // TODO subscribeFields?
                         eventContent.publishFields?.let { publishFields ->
                             Log.d(TAG, "MainActivity: new publishFields: $publishFields")
                             viewModel.setPublishFields(publishFields)
+                        }
+                        eventContent.deviceFields?.let { devicesState ->
+                            Log.d(TAG, "MainActivity: new deviceFields: $devicesState")
+                            viewModel.setDevicesFields(devicesState)
                         }
                     }
                 }
@@ -55,13 +59,12 @@ class MainActivity : BaseActivity() {
         viewModel.viewState.observe(this, Observer { authViewState ->
             Log.d(TAG, "MainActivity: viewState changed to: $authViewState")
             authViewState.publishFields?.let { publishFields ->
-                publishFields.topic?.let {
-                    MqttConnection.publish(
-                        // TODO not just !!, check how to fix this properly
-                        publishFields.topic!!,
-                        publishFields.message!!,
-                        publishFields.qos
-                    )
+                publishFields.topic?.let { topic ->
+                    publishFields.message?.let { message ->
+                        publishFields.qos.let { qos ->
+                            MqttConnection.publish(topic, message, qos)
+                        }
+                    }
                 }
             }
         })
