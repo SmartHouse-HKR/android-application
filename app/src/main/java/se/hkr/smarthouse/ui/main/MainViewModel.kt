@@ -2,16 +2,17 @@ package se.hkr.smarthouse.ui.main
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import se.hkr.smarthouse.models.Device
 import se.hkr.smarthouse.mqtt.MqttConnection
 import se.hkr.smarthouse.repository.main.MainRepository
 import se.hkr.smarthouse.ui.BaseViewModel
 import se.hkr.smarthouse.ui.DataState
-import se.hkr.smarthouse.ui.main.state.LampState
-import se.hkr.smarthouse.ui.main.state.MainStateEvent
-import se.hkr.smarthouse.ui.main.state.MainViewState
-import se.hkr.smarthouse.ui.main.state.PublishFields
-import se.hkr.smarthouse.ui.main.state.SubscribeFields
+import se.hkr.smarthouse.ui.main.state.*
 import se.hkr.smarthouse.util.AbsentLiveData
+import se.hkr.smarthouse.util.Constants
 import javax.inject.Inject
 
 class MainViewModel
@@ -21,17 +22,31 @@ constructor(
 ) : BaseViewModel<MainStateEvent, MainViewState>() {
     override fun handleStateEvent(stateEvent: MainStateEvent): LiveData<DataState<MainViewState>> {
         // Temporary until the functionality is fixed
-        when (stateEvent) {
+        return when (stateEvent) {
             is MainStateEvent.PublishAttemptEvent -> {
-                return mainRepository.attemptPublish(
+                mainRepository.attemptPublish(
                     stateEvent.topic,
-                    stateEvent.message,
-                    stateEvent.qos
+                    stateEvent.message
                 )
             }
             is MainStateEvent.SubscribeAttemptEvent -> {
                 // TODO Implement subscribe using MVI as well
-                return AbsentLiveData.create<DataState<MainViewState>>()
+                AbsentLiveData.create()
+            }
+            is MainStateEvent.UpdateDeviceListEvent -> {
+                //TODO put into repository (with actual query of items?)
+                return object : LiveData<DataState<MainViewState>>() {
+                    override fun onActive() {
+                        super.onActive()
+                        value = DataState.data(
+                            data = MainViewState(
+                                deviceFields = DeviceFields(
+                                    deviceList = stateEvent.list
+                                )
+                            )
+                        )
+                    }
+                }
             }
         }
     }
@@ -40,14 +55,20 @@ constructor(
         return MainViewState()
     }
 
-    fun subscribeTo(topic: String) {
-        // TODO avoid breaking the MVI patter
-        Log.d(TAG, "Subscribing to $topic")
-        MqttConnection.mqttClient.subscribe(topic) { subscribedTopic, messageReceived ->
-            val received = messageReceived.toString()
-            Log.d(TAG, "Got: $received")
-            val state = received == "true"
-            _viewState.postValue(MainViewState(lampState = LampState(state)))
+    fun initializeMqttSubscription() {
+        // TODO explore the idea of not doing this in the ViewModel and somehow have the repository
+        //  do it instead. Right now feeling like it is breaking the MVI pattern.
+        MqttConnection.mqttClient.subscribe("${Constants.BASE_TOPIC}/#") { topic, message ->
+            Log.d(TAG, "MainViewModel: subscription received topic: $topic, message: $message")
+            GlobalScope.launch(Main) {
+                setDevicesFields(
+                    deviceFields = DeviceFields(
+                        deviceList = mutableListOf(
+                            Device.builder(topic, message.toString())
+                        )
+                    )
+                )
+            }
         }
     }
 
@@ -57,16 +78,27 @@ constructor(
             return
         }
         newViewState.publishFields = publishFields
-        _viewState.value = newViewState
+        setViewState(newViewState)
     }
 
-    fun setSubscribeFields(subscribeFields: SubscribeFields) {
+    fun setSubscribeFields(subscribeTopics: SubscribeTopics) {
         val newViewState = getCurrentViewStateOrNew()
-        if (newViewState.subscribeFields == subscribeFields) {
+        if (newViewState.subscribeTopics == subscribeTopics) {
             return
         }
-        newViewState.subscribeFields = subscribeFields
-        _viewState.value = newViewState
+        newViewState.subscribeTopics = subscribeTopics
+        setViewState(newViewState)
+    }
+
+    fun setDevicesFields(deviceFields: DeviceFields) {
+        val newViewState = getCurrentViewStateOrNew()
+        if (newViewState.deviceFields == deviceFields) {
+            return
+        }
+        // TODO check if the ?. on the devices Fields and the !! on the list is okay to do.
+        val newDevices = deviceFields.deviceList!!
+        newViewState.deviceFields?.addDevice(newDevices)
+        setViewState(newViewState)
     }
 
     fun cancelActiveJobs() {

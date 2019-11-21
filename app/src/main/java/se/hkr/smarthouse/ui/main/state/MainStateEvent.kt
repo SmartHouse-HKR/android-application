@@ -1,5 +1,7 @@
 package se.hkr.smarthouse.ui.main.state
 
+import se.hkr.smarthouse.models.Device
+
 sealed class MainStateEvent {
     data class SubscribeAttemptEvent(
         val topic: String
@@ -7,7 +9,10 @@ sealed class MainStateEvent {
 
     data class PublishAttemptEvent(
         val topic: String,
-        val message: String,
-        val qos: Int
+        val message: String
+    ) : MainStateEvent()
+
+    data class UpdateDeviceListEvent(
+        val list: MutableList<Device>
     ) : MainStateEvent()
 }

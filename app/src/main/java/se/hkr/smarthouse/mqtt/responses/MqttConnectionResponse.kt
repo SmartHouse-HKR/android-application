@@ -1,9 +1,9 @@
 package se.hkr.smarthouse.mqtt.responses
 
-class MqttResponse(
+class MqttConnectionResponse(
     var successful: Boolean = false
 ) {
     override fun toString(): String {
-        return "MqttResponse(successful=$successful)"
+        return "MqttConnectionResponse(successful=$successful)"
     }
 }

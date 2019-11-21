@@ -7,7 +7,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import se.hkr.smarthouse.R
-import se.hkr.smarthouse.mqtt.MqttConnection
 import se.hkr.smarthouse.ui.BaseActivity
 import se.hkr.smarthouse.ui.auth.AuthActivity
 import se.hkr.smarthouse.util.setVisibility
@@ -28,12 +27,12 @@ class MainActivity : BaseActivity() {
             sessionManager.logout()
         }
         subscribeObservers()
-        // TODO use nav for it instead of this simple inflation
+        initializeMqttSubscription()
         supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fragment_container,
-                HouseFragment(),
-                "HouseFragment"
+                MainFragment(),
+                "MainFragment"
             ).commit()
     }
 
@@ -44,26 +43,21 @@ class MainActivity : BaseActivity() {
             dataState.data?.let { data ->
                 data.data?.let { dataEvent ->
                     dataEvent.getContentIfNotHandled()?.let { eventContent ->
-                        eventContent.publishFields?.let { publishFields ->
+                        // TODO subscribeTopics?
+                        /*eventContent.publishFields?.let { publishFields ->
                             Log.d(TAG, "MainActivity: new publishFields: $publishFields")
                             viewModel.setPublishFields(publishFields)
+                        }*/
+                        eventContent.deviceFields?.let { devicesState ->
+                            Log.d(TAG, "MainActivity: new deviceFields: $devicesState")
+                            viewModel.setDevicesFields(devicesState)
                         }
                     }
                 }
             }
         })
-        viewModel.viewState.observe(this, Observer { authViewState ->
-            Log.d(TAG, "MainActivity: viewState changed to: $authViewState")
-            authViewState.publishFields?.let { publishFields ->
-                publishFields.topic?.let {
-                    MqttConnection.publish(
-                        // TODO not just !!, check how to fix this properly
-                        publishFields.topic!!,
-                        publishFields.message!!,
-                        publishFields.qos
-                    )
-                }
-            }
+        viewModel.viewState.observe(this, Observer { mainViewState ->
+            Log.d(TAG, "MainActivity: viewState changed to: $mainViewState")
         })
         sessionManager.cachedAccountCredentials.observe(this, Observer { accountCredentials ->
             Log.d(TAG, "MainActivity: Account credentials observed change: $accountCredentials")
@@ -74,6 +68,10 @@ class MainActivity : BaseActivity() {
                 navAuthActivity()
             }
         })
+    }
+
+    private fun initializeMqttSubscription() {
+        viewModel.initializeMqttSubscription()
     }
 
     private fun navAuthActivity() {

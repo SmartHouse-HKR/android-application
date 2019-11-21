@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Job
 import se.hkr.smarthouse.models.AccountCredentials
 import se.hkr.smarthouse.mqtt.MqttConnection
-import se.hkr.smarthouse.mqtt.responses.MqttResponse
+import se.hkr.smarthouse.mqtt.responses.MqttConnectionResponse
 import se.hkr.smarthouse.persistence.AccountCredentialsDao
 import se.hkr.smarthouse.repository.NetworkBoundResource
 import se.hkr.smarthouse.session.SessionManager
@@ -34,13 +34,17 @@ constructor(
         if (loginFieldErrors != LoginFields.LoginError.none()) {
             return returnErrorResponse(loginFieldErrors, ResponseType.Dialog())
         }
-        return object : NetworkBoundResource<MqttResponse, AuthViewState>(
+        return object : NetworkBoundResource<MqttConnectionResponse, AuthViewState>(
             sessionManager.isConnectedToTheInternet()
         ) {
-            override fun handleResponse(response: MqttResponse) {
+            override fun handleResponse(response: MqttConnectionResponse) {
                 Log.d(TAG, "handle response: $response")
                 if (!response.successful) {
-                    return onErrorReturn("Connection Failed", true, false)
+                    return onErrorReturn(
+                        errorMessage = "Connection Failed",
+                        shouldUseDialog = true,
+                        shouldUseToast = false
+                    )
                 }
                 onCompleteJob(
                     DataState.data(
@@ -56,7 +60,7 @@ constructor(
                 )
             }
 
-            override fun createCall(): LiveData<MqttResponse> {
+            override fun createCall(): LiveData<MqttConnectionResponse> {
                 return MqttConnection.connect(
                     username = username,
                     password = password,
