@@ -73,17 +73,7 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
         )
     }
 
-    private fun subscribeTopic() {
-        // TODO do this with event, for now just hard code it
-        //viewModel.setStateEvent(
-        //    MainStateEvent.SubscribeAttemptEvent(
-        //        input_topic.text.toString()
-        //    )
-        //)
-        viewModel.subscribeTo(topic = input_topic.text.toString())
-    }
-
-    override fun onStateChanged(item: Device) {
+    override fun onDeviceStateChanged(item: Device) {
         Log.d(TAG, "State of item ${item.getSimpleName()} changed to: $item")
         val (topic, message) = item.asMqttMessage()
         publishTopic(topic, message)

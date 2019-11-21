@@ -62,7 +62,20 @@ class DeviceListAdapter(
             }
         }
     }
-    private val differ = AsyncListDiffer(this, diffCallback)
+
+    private val differ = object : AsyncListDiffer<Device>(this, diffCallback) {
+        // Have to override because if the list send to submitList is == to the old list, which
+        // is true since we are also updating the local variable whenever there is a change. We get
+        // around it by sending a copy of the list which does not return true on the == operation
+        // and therefore continues on the method and triggers the notifyDataSetChanged()
+        override fun submitList(newList: List<Device>?, commitCallback: Runnable?) {
+            super.submitList(newList?.toList(), commitCallback)
+        }
+
+        override fun submitList(newList: MutableList<Device>?) {
+            super.submitList(newList?.toList())
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return when (viewType) {
@@ -185,7 +198,7 @@ class DeviceListAdapter(
             itemView.deviceSwitch.isChecked = currentItem.state
             itemView.deviceSwitch.setOnClickListener {
                 currentItem.state = itemView.deviceSwitch.isChecked
-                interaction.onStateChanged(currentItem)
+                interaction.onDeviceStateChanged(currentItem)
             }
         }
     }
@@ -222,7 +235,7 @@ class DeviceListAdapter(
             itemView.deviceSlider.setOnTouchListener { _, event ->
                 if (event?.action == MotionEvent.ACTION_UP) {
                     Log.d(TAG, "Slider released, sending new value ${currentItem.temperature}")
-                    interaction.onStateChanged(currentItem)
+                    interaction.onDeviceStateChanged(currentItem)
                 }
                 false
             }
@@ -274,21 +287,21 @@ class DeviceListAdapter(
             itemView.deviceSliderRed.setOnTouchListener { _, event ->
                 if (event?.action == MotionEvent.ACTION_UP) {
                     Log.d(TAG, "Slider released, sending new value ${currentItem.red}")
-                    interaction.onStateChanged(currentItem)
+                    interaction.onDeviceStateChanged(currentItem)
                 }
                 false
             }
             itemView.deviceSliderGreen.setOnTouchListener { _, event ->
                 if (event?.action == MotionEvent.ACTION_UP) {
                     Log.d(TAG, "Slider released, sending new value ${currentItem.green}")
-                    interaction.onStateChanged(currentItem)
+                    interaction.onDeviceStateChanged(currentItem)
                 }
                 false
             }
             itemView.deviceSliderBlue.setOnTouchListener { _, event ->
                 if (event?.action == MotionEvent.ACTION_UP) {
                     Log.d(TAG, "Slider released, sending new value ${currentItem.blue}")
-                    interaction.onStateChanged(currentItem)
+                    interaction.onDeviceStateChanged(currentItem)
                 }
                 false
             }
@@ -302,6 +315,6 @@ class DeviceListAdapter(
     }
 
     interface Interaction {
-        fun onStateChanged(item: Device)
+        fun onDeviceStateChanged(item: Device)
     }
 }

@@ -1,11 +1,18 @@
 package se.hkr.smarthouse.ui.main
 
+import android.util.Log
 import androidx.lifecycle.LiveData
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import se.hkr.smarthouse.models.Device
+import se.hkr.smarthouse.mqtt.MqttConnection
 import se.hkr.smarthouse.repository.main.MainRepository
 import se.hkr.smarthouse.ui.BaseViewModel
 import se.hkr.smarthouse.ui.DataState
 import se.hkr.smarthouse.ui.main.state.*
 import se.hkr.smarthouse.util.AbsentLiveData
+import se.hkr.smarthouse.util.Constants
 import javax.inject.Inject
 
 class MainViewModel
@@ -48,15 +55,21 @@ constructor(
         return MainViewState()
     }
 
-    fun subscribeTo(topic: String) {
-        /*
-        Log.d(TAG, "Subscribing to $topic")
-        MqttConnection.mqttClient.subscribe(topic) { subscribedTopic, messageReceived ->
-            val received = messageReceived.toString()
-            Log.d(TAG, "Got: $received")
-            val state = received == "true"
-            _viewState.postValue(MainViewState(deviceFields = DeviceFields(state)))
-        }*/
+    fun initializeMqttSubscription() {
+        // TODO explore the idea of not doing this in the ViewModel and somehow have the repository
+        //  do it instead. Right now feeling like it is breaking the MVI pattern.
+        MqttConnection.mqttClient.subscribe("${Constants.BASE_TOPIC}/#") { topic, message ->
+            Log.d(TAG, "MainViewModel: subscription received topic: $topic, message: $message")
+            GlobalScope.launch(Main) {
+                setDevicesFields(
+                    deviceFields = DeviceFields(
+                        deviceList = mutableListOf(
+                            Device.builder(topic, message.toString())
+                        )
+                    )
+                )
+            }
+        }
     }
 
     fun setPublishFields(publishFields: PublishFields) {
@@ -68,12 +81,12 @@ constructor(
         setViewState(newViewState)
     }
 
-    fun setSubscribeFields(subscribeFields: SubscribeFields) {
+    fun setSubscribeFields(subscribeTopics: SubscribeTopics) {
         val newViewState = getCurrentViewStateOrNew()
-        if (newViewState.subscribeFields == subscribeFields) {
+        if (newViewState.subscribeTopics == subscribeTopics) {
             return
         }
-        newViewState.subscribeFields = subscribeFields
+        newViewState.subscribeTopics = subscribeTopics
         setViewState(newViewState)
     }
 

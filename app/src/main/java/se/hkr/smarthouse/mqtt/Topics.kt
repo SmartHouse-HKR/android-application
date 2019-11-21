@@ -1,6 +1,7 @@
 package se.hkr.smarthouse.mqtt
 
 import se.hkr.smarthouse.models.Device
+import se.hkr.smarthouse.util.Constants
 
 object Topics {
     // TODO make it somehow to "Contains" lamp for example, not necessarily just "lamp" might need
@@ -22,24 +23,24 @@ object Topics {
     )
 
     val allTopicsList = mutableListOf<Device>(
-        Device.InteractiveOnOff("Smarthome/livingRoom/bluetoothFan"),
-        Device.InteractiveOnOff("Smarthome/livingRoom/lamp"),
-        Device.InteractiveOnOff("Smarthome/livingRoom/bluetoothCeilingLight"),
-        Device.ObservableOnOff("Smarthome/livingRoom/windowSensor"),
-        Device.InteractiveTemperature("Smarthome/livingRoom/heater"),
-        Device.ObservableTemperature("Smarthome/livingRoom/temperatureSensor"),
+        Device.InteractiveOnOff("${Constants.BASE_TOPIC}/livingRoom/bluetoothFan"),
+        Device.InteractiveOnOff("${Constants.BASE_TOPIC}/livingRoom/lamp"),
+        Device.InteractiveOnOff("${Constants.BASE_TOPIC}/livingRoom/bluetoothCeilingLight"),
+        Device.ObservableOnOff("${Constants.BASE_TOPIC}/livingRoom/windowSensor"),
+        Device.InteractiveTemperature("${Constants.BASE_TOPIC}/livingRoom/heater"),
+        Device.ObservableTemperature("${Constants.BASE_TOPIC}/livingRoom/temperatureSensor"),
 
-        Device.InteractiveOnOff("Smarthome/attic/fan"),
-        Device.InteractiveTemperature("Smarthome/attic/heater"),
+        Device.InteractiveOnOff("${Constants.BASE_TOPIC}/attic/fan"),
+        Device.InteractiveTemperature("${Constants.BASE_TOPIC}/attic/heater"),
 
-        Device.ObservableOnOff("Smarthome/kitchen/fireAlarm"),
-        Device.ObservableOnOff("Smarthome/kitchen/waterLeakageSensor"),
+        Device.ObservableOnOff("${Constants.BASE_TOPIC}/kitchen/fireAlarm"),
+        Device.ObservableOnOff("${Constants.BASE_TOPIC}/kitchen/waterLeakageSensor"),
 
-        Device.ObservableOnOff("Smarthome/outside/alarm"),
-        Device.ObservableOnOff("Smarthome/outside/securityLight"),
-        Device.ObservableOnOff("Smarthome/outside/twilightSensor"),
-        Device.ObservableTemperature("Smarthome/outside/temperatureSensor"),
+        Device.ObservableOnOff("${Constants.BASE_TOPIC}/outside/alarm"),
+        Device.ObservableOnOff("${Constants.BASE_TOPIC}/outside/securityLight"),
+        Device.ObservableOnOff("${Constants.BASE_TOPIC}/outside/twilightSensor"),
+        Device.ObservableTemperature("${Constants.BASE_TOPIC}/outside/temperatureSensor"),
 
-        Device.InteractiveRgb("Smarthome/rgbLight", 20, 40, 50)
+        Device.InteractiveRgb("${Constants.BASE_TOPIC}/rgbLight", 20, 40, 50)
     )
 }

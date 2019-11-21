@@ -27,6 +27,7 @@ class MainActivity : BaseActivity() {
             sessionManager.logout()
         }
         subscribeObservers()
+        initializeMqttSubscription()
         supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fragment_container,
@@ -42,7 +43,7 @@ class MainActivity : BaseActivity() {
             dataState.data?.let { data ->
                 data.data?.let { dataEvent ->
                     dataEvent.getContentIfNotHandled()?.let { eventContent ->
-                        // TODO subscribeFields?
+                        // TODO subscribeTopics?
                         /*eventContent.publishFields?.let { publishFields ->
                             Log.d(TAG, "MainActivity: new publishFields: $publishFields")
                             viewModel.setPublishFields(publishFields)
@@ -67,6 +68,10 @@ class MainActivity : BaseActivity() {
                 navAuthActivity()
             }
         })
+    }
+
+    private fun initializeMqttSubscription() {
+        viewModel.initializeMqttSubscription()
     }
 
     private fun navAuthActivity() {

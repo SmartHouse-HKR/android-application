@@ -6,7 +6,7 @@ import se.hkr.smarthouse.models.Device
 const val TAG = "AppDebug"
 
 data class MainViewState(
-    var subscribeFields: SubscribeFields? = SubscribeFields(),
+    var subscribeTopics: SubscribeTopics? = SubscribeTopics(),
     var publishFields: PublishFields? = PublishFields(),
     var deviceFields: DeviceFields? = DeviceFields()
 )
@@ -43,11 +43,9 @@ data class DeviceFields(
     }
 }
 
-data class SubscribeFields(
-    var topic: String? = null
-) {
-    // TODO implement this as well
-}
+data class SubscribeTopics(
+    var topics: MutableList<String>? = null
+)
 
 data class PublishFields(
     var topic: String? = null,
