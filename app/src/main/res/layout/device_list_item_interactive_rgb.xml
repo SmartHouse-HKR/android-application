@@ -42,7 +42,7 @@
                 android:stepSize="1"
                 android:value="50"
                 android:valueFrom="0"
-                android:valueTo="100"
+                android:valueTo="255"
                 app:layout_constraintEnd_toStartOf="@+id/textViewRedValue"
                 app:layout_constraintStart_toEndOf="@+id/textViewRed"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -85,7 +85,7 @@
                 android:stepSize="1"
                 android:value="50"
                 android:valueFrom="0"
-                android:valueTo="100"
+                android:valueTo="255"
                 app:layout_constraintEnd_toStartOf="@+id/textViewGreenValue"
                 app:layout_constraintStart_toEndOf="@+id/textViewGreen"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -128,7 +128,7 @@
                 android:stepSize="1"
                 android:value="50"
                 android:valueFrom="0"
-                android:valueTo="100"
+                android:valueTo="255"
                 app:layout_constraintEnd_toStartOf="@+id/textViewBlueValue"
                 app:layout_constraintStart_toEndOf="@+id/textViewBlue"
                 app:layout_constraintTop_toTopOf="parent" />
