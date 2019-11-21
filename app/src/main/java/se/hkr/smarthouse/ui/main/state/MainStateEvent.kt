@@ -9,8 +9,7 @@ sealed class MainStateEvent {
 
     data class PublishAttemptEvent(
         val topic: String,
-        val message: String,
-        val qos: Int
+        val message: String
     ) : MainStateEvent()
 
     data class UpdateDeviceListEvent(

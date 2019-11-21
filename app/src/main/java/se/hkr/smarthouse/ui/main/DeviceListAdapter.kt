@@ -16,9 +16,7 @@ import se.hkr.smarthouse.R
 import se.hkr.smarthouse.models.Device
 
 class DeviceListAdapter(
-    private val clickInteraction: ClickInteraction? = null,
-    private val switchInteraction: SwitchInteraction? = null,
-    private val sliderInteraction: SliderInteraction? = null
+    private val interaction: Interaction
 ) : RecyclerView.Adapter<DeviceListAdapter.BaseViewHolder<*>>() {
     companion object {
         const val TAG = "AppDebug"
@@ -30,16 +28,37 @@ class DeviceListAdapter(
         }
 
         override fun areContentsTheSame(oldItem: Device, newItem: Device): Boolean {
-            if (oldItem::class != newItem::class) {
+            try {
+                return when (oldItem) {
+                    is Device.UnknownDevice -> {
+                        return true
+                    }
+                    is Device.InteractiveOnOff -> {
+                        newItem as Device.InteractiveOnOff
+                        newItem.state == oldItem.state
+                    }
+                    is Device.ObservableOnOff -> {
+                        newItem as Device.ObservableOnOff
+                        newItem.state == oldItem.state
+                    }
+                    is Device.InteractiveTemperature -> {
+                        newItem as Device.InteractiveTemperature
+                        newItem.temperature == oldItem.temperature
+                    }
+                    is Device.ObservableTemperature -> {
+                        newItem as Device.ObservableTemperature
+                        newItem.temperature == oldItem.temperature
+                    }
+                    is Device.InteractiveRgb -> {
+                        newItem as Device.InteractiveRgb
+                        return (newItem.red == oldItem.red &&
+                                newItem.green == oldItem.green &&
+                                newItem.blue == oldItem.blue)
+                    }
+                }
+            } catch (e: Exception) {
+                // If typecast failed, means they are different class anyway, therefore different.
                 return false
-            }
-            return when (oldItem) {
-                is Device.UnknownDevice -> true
-                is Device.InteractiveOnOff -> newItem as Device.InteractiveOnOff == oldItem
-                is Device.ObservableOnOff -> newItem as Device.ObservableOnOff == oldItem
-                is Device.InteractiveTemperature -> newItem as Device.InteractiveTemperature == oldItem
-                is Device.ObservableTemperature -> newItem as Device.ObservableTemperature == oldItem
-                is Device.InteractiveRgb -> newItem as Device.InteractiveRgb == oldItem
             }
         }
     }
@@ -59,8 +78,7 @@ class DeviceListAdapter(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_interactive_on_off, parent, false
                     ),
-                    clickInteraction,
-                    switchInteraction
+                    interaction
                 )
             }
             Device.ObservableOnOff.IDENTIFIER -> {
@@ -75,19 +93,22 @@ class DeviceListAdapter(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_interactive_temperature, parent, false
                     ),
-                    clickInteraction,
-                    sliderInteraction
+                    interaction
                 )
             }
-            /*Device.ObservableTemperature.IDENTIFIER -> {
-
-            }*/
+            Device.ObservableTemperature.IDENTIFIER -> {
+                ObservableTemperatureViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.device_list_item_observable_temperature, parent, false
+                    )
+                )
+            }
             Device.InteractiveRgb.IDENTIFIER -> {
                 InteractiveRgbViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_interactive_rgb, parent, false
                     ),
-                    clickInteraction
+                    interaction
                 )
             }
             else -> EmptyViewHolder(
@@ -108,10 +129,11 @@ class DeviceListAdapter(
                 holder.bind(element as Device.ObservableOnOff)
             }
             is InteractiveTemperatureViewHolder -> {
+                holder.bind(element as Device.InteractiveTemperature)
             }
-            /*is ObservableTemperatureViewHolder -> {
-
-            }*/
+            is ObservableTemperatureViewHolder -> {
+                holder.bind(element as Device.ObservableTemperature)
+            }
             is InteractiveRgbViewHolder -> {
                 holder.bind(element as Device.InteractiveRgb)
             }
@@ -138,7 +160,7 @@ class DeviceListAdapter(
     }
 
     fun submitList(list: List<Device>) {
-        differ.submitList(list)
+        differ.submitList(list) { Log.d(TAG, "adapter list submission done") }
     }
 
     inner class EmptyViewHolder
@@ -153,22 +175,18 @@ class DeviceListAdapter(
     inner class InteractiveOnOffViewHolder
     constructor(
         itemView: View,
-        private val clickInteraction: ClickInteraction?,
-        private val switchInteraction: SwitchInteraction?
+        private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
         override fun bind(item: Device) = with(itemView) {
             val currentItem = item as Device.InteractiveOnOff
             Log.d(TAG, "Binding interactive on/off: $currentItem")
-            itemView.setOnClickListener {
-                clickInteraction?.onItemSelected(adapterPosition, currentItem)
-            }
-            itemView.deviceSwitch.setOnClickListener {
-                //TODO check if we need to update the value here or in the viewState
-                switchInteraction?.onSwitchClicked(deviceSwitch.isChecked, currentItem)
-            }
-            itemView.deviceName.text = currentItem.getName()
+            itemView.deviceName.text = currentItem.getSimpleName()
             itemView.deviceTopic.text = currentItem.topic
             itemView.deviceSwitch.isChecked = currentItem.state
+            itemView.deviceSwitch.setOnClickListener {
+                currentItem.state = itemView.deviceSwitch.isChecked
+                interaction.onStateChanged(currentItem)
+            }
         }
     }
 
@@ -179,7 +197,7 @@ class DeviceListAdapter(
         override fun bind(item: Device) = with(itemView) {
             val currentItem = item as Device.ObservableOnOff
             Log.d(TAG, "Binding observable on/off: $currentItem")
-            itemView.deviceName.text = currentItem.getName()
+            itemView.deviceName.text = currentItem.getSimpleName()
             itemView.deviceTopic.text = currentItem.topic
             itemView.deviceSwitch.isChecked = currentItem.state
         }
@@ -188,67 +206,92 @@ class DeviceListAdapter(
     inner class InteractiveTemperatureViewHolder
     constructor(
         itemView: View,
-        private val clickInteraction: ClickInteraction?,
-        private val sliderInteraction: SliderInteraction?
+        private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
         override fun bind(item: Device) = with(itemView) {
             val currentItem = item as Device.InteractiveTemperature
-            Log.d(TAG, "Binding slider: $currentItem")
-            deviceSlider.setOnChangeListener { slider, value ->
-                Log.d(TAG, "Slider: $slider, changed the value to $value")
-                sliderInteraction?.onSliderUpdated(value.toInt(), currentItem)
-            }
-            itemView.setOnClickListener {
-                clickInteraction?.onItemSelected(adapterPosition, currentItem)
-            }
-
-            itemView.deviceName.text = currentItem.getName()
+            Log.d(TAG, "Binding interactive temperature: $currentItem")
+            itemView.deviceName.text = currentItem.getSimpleName()
             itemView.deviceTopic.text = currentItem.topic
-            itemView.deviceSlider.value = currentItem.temperature
+            itemView.deviceSlider.value = currentItem.temperature.toFloat()
+            itemView.deviceSlider.setOnChangeListener { _, value ->
+                val roundedFloat = String.format("%.2f", value)
+                currentItem.temperature = roundedFloat
+                itemView.textViewSliderValue.text = roundedFloat
+            }
+            itemView.deviceSlider.setOnTouchListener { _, event ->
+                if (event?.action == MotionEvent.ACTION_UP) {
+                    Log.d(TAG, "Slider released, sending new value ${currentItem.temperature}")
+                    interaction.onStateChanged(currentItem)
+                }
+                false
+            }
+        }
+    }
+
+    inner class ObservableTemperatureViewHolder
+    constructor(
+        itemView: View
+    ) : BaseViewHolder<Device>(itemView) {
+        override fun bind(item: Device) = with(itemView) {
+            val currentItem = item as Device.ObservableTemperature
+            Log.d(TAG, "Binding observable temperature: $currentItem")
+            itemView.deviceName.text = currentItem.getSimpleName()
+            itemView.deviceTopic.text = currentItem.topic
+            itemView.deviceSlider.value = currentItem.temperature.toFloat()
+            itemView.deviceSlider.isClickable = false
         }
     }
 
     inner class InteractiveRgbViewHolder
     constructor(
         itemView: View,
-        private val clickInteraction: ClickInteraction?
+        private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
         override fun bind(item: Device) = with(itemView) {
             val currentItem = item as Device.InteractiveRgb
             Log.d(TAG, "Binding rgb: $currentItem")
-            itemView.deviceSliderRed.setOnChangeListener { _, value ->
-                currentItem.red = value.toInt()
-                itemView.textViewRedValue.text = value.toInt().toString()
-            }
-            itemView.deviceSliderGreen.setOnChangeListener { _, value ->
-                currentItem.green = value.toInt()
-                itemView.textViewGreenValue.text = value.toInt().toString()
-            }
-            itemView.deviceSliderBlue.setOnChangeListener { _, value ->
-                currentItem.blue = value.toInt()
-                itemView.textViewBlueValue.text = value.toInt().toString()
-            }
-            itemView.deviceSliderRed.setOnTouchListener { _, event ->
-                if (event?.action == MotionEvent.ACTION_UP) {
-                    //todo send event back to fragment
-                }
-                false
-            }
-            itemView.deviceSliderGreen.setOnChangeListener { _, value ->
-                currentItem.green = value.toInt()
-            }
-            itemView.deviceSliderBlue.setOnChangeListener { _, value ->
-                currentItem.blue = value.toInt()
-            }
-            itemView.setOnClickListener {
-                clickInteraction?.onItemSelected(adapterPosition, currentItem)
-            }
-
-            itemView.deviceName.text = currentItem.getName()
+            itemView.deviceName.text = currentItem.getSimpleName()
             itemView.deviceTopic.text = currentItem.topic
             itemView.deviceSliderRed.value = currentItem.red.toFloat()
             itemView.deviceSliderGreen.value = currentItem.green.toFloat()
             itemView.deviceSliderBlue.value = currentItem.blue.toFloat()
+            itemView.deviceSliderRed.setOnChangeListener { _, value ->
+                val intValue = value.toInt()
+                currentItem.red = intValue
+                itemView.textViewRedValue.text = intValue.toString()
+            }
+            itemView.deviceSliderGreen.setOnChangeListener { _, value ->
+                val intValue = value.toInt()
+                currentItem.green = intValue
+                itemView.textViewGreenValue.text = intValue.toString()
+            }
+            itemView.deviceSliderBlue.setOnChangeListener { _, value ->
+                val intValue = value.toInt()
+                currentItem.blue = intValue
+                itemView.textViewBlueValue.text = intValue.toString()
+            }
+            itemView.deviceSliderRed.setOnTouchListener { _, event ->
+                if (event?.action == MotionEvent.ACTION_UP) {
+                    Log.d(TAG, "Slider released, sending new value ${currentItem.red}")
+                    interaction.onStateChanged(currentItem)
+                }
+                false
+            }
+            itemView.deviceSliderGreen.setOnTouchListener { _, event ->
+                if (event?.action == MotionEvent.ACTION_UP) {
+                    Log.d(TAG, "Slider released, sending new value ${currentItem.green}")
+                    interaction.onStateChanged(currentItem)
+                }
+                false
+            }
+            itemView.deviceSliderBlue.setOnTouchListener { _, event ->
+                if (event?.action == MotionEvent.ACTION_UP) {
+                    Log.d(TAG, "Slider released, sending new value ${currentItem.blue}")
+                    interaction.onStateChanged(currentItem)
+                }
+                false
+            }
         }
     }
 
@@ -258,15 +301,7 @@ class DeviceListAdapter(
         abstract fun bind(item: T)
     }
 
-    interface ClickInteraction {
-        fun onItemSelected(position: Int, item: Device)
-    }
-
-    interface SwitchInteraction {
-        fun onSwitchClicked(state: Boolean, item: Device)
-    }
-
-    interface SliderInteraction {
-        fun onSliderUpdated(value: Int, item: Device)
+    interface Interaction {
+        fun onStateChanged(item: Device)
     }
 }

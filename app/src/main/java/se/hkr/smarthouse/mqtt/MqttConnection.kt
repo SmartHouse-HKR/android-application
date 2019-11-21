@@ -7,7 +7,8 @@ import org.eclipse.paho.client.mqttv3.MqttClient
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
-import se.hkr.smarthouse.mqtt.responses.MqttResponse
+import se.hkr.smarthouse.mqtt.responses.MqttConnectionResponse
+import se.hkr.smarthouse.util.Constants
 import java.util.*
 
 object MqttConnection {
@@ -16,19 +17,18 @@ object MqttConnection {
 
     fun publish(
         topic: String,
-        message: String,
-        qos: Int
-    ): LiveData<MqttResponse> {
-        val liveData = MutableLiveData<MqttResponse>()
+        message: String
+    ): LiveData<MqttConnectionResponse> {
+        val liveData = MutableLiveData<MqttConnectionResponse>()
         try {
-            Log.d(TAG, "MqttConnection: publishing: topic: $topic, deviceList: $message, qos: $qos")
+            Log.d(TAG, "MqttConnection: publishing: topic: $topic, message: $message")
             val mqttMessage = MqttMessage(message.toByteArray())
-            mqttMessage.qos = qos
+            mqttMessage.qos = Constants.QOS
             mqttClient.publish(topic, mqttMessage)
-            liveData.value = MqttResponse(true)
+            liveData.value = MqttConnectionResponse(true)
             Log.d(TAG, "Mqtt connection success")
         } catch (e: Exception) {
-            liveData.value = MqttResponse(false)
+            liveData.value = MqttConnectionResponse(false)
             Log.e(TAG, "Mqtt connection failure")
             Log.e(TAG, "Exception stack trace: ", e)
         }
@@ -39,8 +39,8 @@ object MqttConnection {
         username: String,
         password: String,
         hostUrl: String
-    ): LiveData<MqttResponse> {
-        val liveData = MutableLiveData<MqttResponse>()
+    ): LiveData<MqttConnectionResponse> {
+        val liveData = MutableLiveData<MqttConnectionResponse>()
         try {
             mqttClient = MqttClient(
                 hostUrl,
@@ -53,10 +53,10 @@ object MqttConnection {
             // connectionOptions.userName = username
             // connectionOptions.password = password.toCharArray()
             mqttClient.connect(connectionOptions)
-            liveData.value = MqttResponse(true)
+            liveData.value = MqttConnectionResponse(true)
             Log.d(TAG, "Mqtt connection success")
         } catch (e: Exception) {
-            liveData.value = MqttResponse(false)
+            liveData.value = MqttConnectionResponse(false)
             Log.e(TAG, "Mqtt connection failure")
             Log.e(TAG, "Exception stack trace: ", e)
         }

@@ -38,7 +38,7 @@ constructor(
             return
         }
         newViewState.loginFields = loginFields
-        _viewState.value = newViewState
+        setViewState(newViewState)
     }
 
     fun setAccountCredentials(accountCredentials: AccountCredentials) {
@@ -47,7 +47,7 @@ constructor(
             return
         }
         newViewState.accountCredentials = accountCredentials
-        _viewState.value = newViewState
+        setViewState(newViewState)
     }
 
     fun cancelActiveJobs() {

@@ -3,17 +3,9 @@ package se.hkr.smarthouse.repository
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import kotlinx.coroutines.CompletableJob
-import kotlinx.coroutines.CompletionHandler
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import se.hkr.smarthouse.ui.DataState
 import se.hkr.smarthouse.ui.Response
 import se.hkr.smarthouse.ui.ResponseType
@@ -78,10 +70,18 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
                     if (job.isCancelled) {
                         Log.e("TAG", "NetworkBoundResource: Job has been cancelled.")
                         cause?.let {
-                            onErrorReturn(it.message, false, true)
-                        } ?: onErrorReturn(ERROR_UNKNOWN, false, true)
+                            onErrorReturn(
+                                errorMessage = it.message,
+                                shouldUseDialog = false,
+                                shouldUseToast = true
+                            )
+                        } ?: onErrorReturn(
+                            errorMessage = ERROR_UNKNOWN,
+                            shouldUseDialog = false,
+                            shouldUseToast = true
+                        )
                     } else if (job.isCompleted) {
-                        Log.e(TAG, "NetworkBoundResource: Job has been completed...")
+                        Log.i(TAG, "NetworkBoundResource: Job has been completed...")
                         //Do nothing. Should be handled already.
                     }
                 }

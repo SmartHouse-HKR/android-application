@@ -19,8 +19,7 @@ constructor(
             is MainStateEvent.PublishAttemptEvent -> {
                 mainRepository.attemptPublish(
                     stateEvent.topic,
-                    stateEvent.message,
-                    stateEvent.qos
+                    stateEvent.message
                 )
             }
             is MainStateEvent.SubscribeAttemptEvent -> {
@@ -50,7 +49,7 @@ constructor(
     }
 
     fun subscribeTo(topic: String) {
-        /*// TODO avoid breaking the MVI patter
+        /*
         Log.d(TAG, "Subscribing to $topic")
         MqttConnection.mqttClient.subscribe(topic) { subscribedTopic, messageReceived ->
             val received = messageReceived.toString()
@@ -66,7 +65,7 @@ constructor(
             return
         }
         newViewState.publishFields = publishFields
-        _viewState.value = newViewState
+        setViewState(newViewState)
     }
 
     fun setSubscribeFields(subscribeFields: SubscribeFields) {
@@ -75,7 +74,7 @@ constructor(
             return
         }
         newViewState.subscribeFields = subscribeFields
-        _viewState.value = newViewState
+        setViewState(newViewState)
     }
 
     fun setDevicesFields(deviceFields: DeviceFields) {
@@ -86,7 +85,7 @@ constructor(
         // TODO check if the ?. on the devices Fields and the !! on the list is okay to do.
         val newDevices = deviceFields.deviceList!!
         newViewState.deviceFields?.addDevice(newDevices)
-        _viewState.value = newViewState
+        setViewState(newViewState)
     }
 
     fun cancelActiveJobs() {

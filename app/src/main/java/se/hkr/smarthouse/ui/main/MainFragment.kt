@@ -9,11 +9,12 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_main.*
 import se.hkr.smarthouse.R
+import se.hkr.smarthouse.models.Device
 import se.hkr.smarthouse.mqtt.Topics
 import se.hkr.smarthouse.ui.main.state.MainStateEvent
 import se.hkr.smarthouse.util.TopSpacingItemDecoration
 
-class MainFragment : BaseMainFragment() {
+class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
     private lateinit var recyclerAdapter: DeviceListAdapter
 
     override fun onCreateView(
@@ -44,7 +45,7 @@ class MainFragment : BaseMainFragment() {
     }
 
     private fun initializeRecyclerView() {
-        recyclerAdapter = DeviceListAdapter()
+        recyclerAdapter = DeviceListAdapter(this@MainFragment)
         val topSpacingDecoration = TopSpacingItemDecoration(topPadding = 30)
         mainFragmentRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainFragment.context)
@@ -59,13 +60,15 @@ class MainFragment : BaseMainFragment() {
         )
     }
 
-    private fun publishTopic(state: Boolean) {
-        Log.d(TAG, "flipped to $state")
+    private fun publishTopic(
+        topic: String,
+        message: String
+    ) {
+        Log.d(TAG, "Will publish on topic: $topic the message: $message")
         viewModel.setStateEvent(
             MainStateEvent.PublishAttemptEvent(
-                topic = input_topic.text.toString(),
-                message = if (state) "true" else "false",
-                qos = 2 // TODO add variable for QOS
+                topic,
+                message
             )
         )
     }
@@ -78,5 +81,11 @@ class MainFragment : BaseMainFragment() {
         //    )
         //)
         viewModel.subscribeTo(topic = input_topic.text.toString())
+    }
+
+    override fun onStateChanged(item: Device) {
+        Log.d(TAG, "State of item ${item.getSimpleName()} changed to: $item")
+        val (topic, message) = item.asMqttMessage()
+        publishTopic(topic, message)
     }
 }

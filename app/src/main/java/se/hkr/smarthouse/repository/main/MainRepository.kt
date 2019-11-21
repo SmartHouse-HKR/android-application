@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Job
 import se.hkr.smarthouse.models.Device
 import se.hkr.smarthouse.mqtt.MqttConnection
-import se.hkr.smarthouse.mqtt.responses.MqttResponse
+import se.hkr.smarthouse.mqtt.responses.MqttConnectionResponse
 import se.hkr.smarthouse.repository.NetworkBoundResource
 import se.hkr.smarthouse.session.SessionManager
 import se.hkr.smarthouse.ui.DataState
@@ -26,20 +26,23 @@ constructor(
 
     fun attemptPublish(
         topic: String,
-        message: String,
-        qos: Int
+        message: String
     ): LiveData<DataState<MainViewState>> {
-        val publishFieldErrors = PublishFields(topic, message, qos).isValidForPublish()
+        val publishFieldErrors = PublishFields(topic, message).isValidForPublish()
         if (publishFieldErrors != PublishFields.PublishError.none()) {
             return returnErrorResponse(publishFieldErrors, ResponseType.Dialog())
         }
-        return object : NetworkBoundResource<MqttResponse, MainViewState>(
+        return object : NetworkBoundResource<MqttConnectionResponse, MainViewState>(
             sessionManager.isConnectedToTheInternet()
         ) {
-            override fun handleResponse(response: MqttResponse) {
+            override fun handleResponse(response: MqttConnectionResponse) {
                 Log.d(TAG, "handle response: $response")
                 if (!response.successful) {
-                    return onErrorReturn("Connection Failed", true, false)
+                    return onErrorReturn(
+                        errorMessage = "Connection Failed",
+                        shouldUseDialog = true,
+                        shouldUseToast = false
+                    )
                 }
                 onCompleteJob(
                     DataState.data(
@@ -54,11 +57,10 @@ constructor(
                 )
             }
 
-            override fun createCall(): LiveData<MqttResponse> {
+            override fun createCall(): LiveData<MqttConnectionResponse> {
                 return MqttConnection.publish(
                     topic = topic,
-                    message = message,
-                    qos = qos
+                    message = message
                 )
             }
 

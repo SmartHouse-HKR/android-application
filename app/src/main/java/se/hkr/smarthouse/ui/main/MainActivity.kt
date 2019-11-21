@@ -7,7 +7,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import se.hkr.smarthouse.R
-import se.hkr.smarthouse.mqtt.MqttConnection
 import se.hkr.smarthouse.ui.BaseActivity
 import se.hkr.smarthouse.ui.auth.AuthActivity
 import se.hkr.smarthouse.util.setVisibility
@@ -44,10 +43,10 @@ class MainActivity : BaseActivity() {
                 data.data?.let { dataEvent ->
                     dataEvent.getContentIfNotHandled()?.let { eventContent ->
                         // TODO subscribeFields?
-                        eventContent.publishFields?.let { publishFields ->
+                        /*eventContent.publishFields?.let { publishFields ->
                             Log.d(TAG, "MainActivity: new publishFields: $publishFields")
                             viewModel.setPublishFields(publishFields)
-                        }
+                        }*/
                         eventContent.deviceFields?.let { devicesState ->
                             Log.d(TAG, "MainActivity: new deviceFields: $devicesState")
                             viewModel.setDevicesFields(devicesState)
@@ -56,17 +55,8 @@ class MainActivity : BaseActivity() {
                 }
             }
         })
-        viewModel.viewState.observe(this, Observer { authViewState ->
-            Log.d(TAG, "MainActivity: viewState changed to: $authViewState")
-            authViewState.publishFields?.let { publishFields ->
-                publishFields.topic?.let { topic ->
-                    publishFields.message?.let { message ->
-                        publishFields.qos.let { qos ->
-                            MqttConnection.publish(topic, message, qos)
-                        }
-                    }
-                }
-            }
+        viewModel.viewState.observe(this, Observer { mainViewState ->
+            Log.d(TAG, "MainActivity: viewState changed to: $mainViewState")
         })
         sessionManager.cachedAccountCredentials.observe(this, Observer { accountCredentials ->
             Log.d(TAG, "MainActivity: Account credentials observed change: $accountCredentials")
