@@ -24,6 +24,23 @@ constructor(
     val TAG = "AppDebug"
     private var repositoryJob: Job? = null
 
+    fun updateDeviceList(
+        newList: MutableList<Device>
+    ): LiveData<DataState<MainViewState>> {
+        return object : LiveData<DataState<MainViewState>>() {
+            override fun onActive() {
+                super.onActive()
+                value = DataState.data(
+                    data = MainViewState(
+                        deviceFields = DeviceFields(
+                            deviceList = newList
+                        )
+                    )
+                )
+            }
+        }
+    }
+
     fun attemptPublish(
         topic: String,
         message: String

@@ -34,19 +34,9 @@ constructor(
                 AbsentLiveData.create()
             }
             is MainStateEvent.UpdateDeviceListEvent -> {
-                //TODO put into repository (with actual query of items?)
-                return object : LiveData<DataState<MainViewState>>() {
-                    override fun onActive() {
-                        super.onActive()
-                        value = DataState.data(
-                            data = MainViewState(
-                                deviceFields = DeviceFields(
-                                    deviceList = stateEvent.list
-                                )
-                            )
-                        )
-                    }
-                }
+                mainRepository.updateDeviceList(
+                    stateEvent.list
+                )
             }
         }
     }
