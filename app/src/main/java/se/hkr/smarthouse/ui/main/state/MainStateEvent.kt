@@ -13,6 +13,6 @@ sealed class MainStateEvent {
     ) : MainStateEvent()
 
     data class UpdateDeviceListEvent(
-        val list: MutableList<Device>
+        val device: Device
     ) : MainStateEvent()
 }

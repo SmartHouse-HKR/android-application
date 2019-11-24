@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Job
 import se.hkr.smarthouse.models.Device
+import se.hkr.smarthouse.models.deviceBuilder
 import se.hkr.smarthouse.mqtt.MqttConnection
 import se.hkr.smarthouse.mqtt.responses.MqttConnectionResponse
 import se.hkr.smarthouse.repository.NetworkBoundResource
@@ -24,8 +25,8 @@ constructor(
     val TAG = "AppDebug"
     private var repositoryJob: Job? = null
 
-    fun updateDeviceList(
-        newList: MutableList<Device>
+    fun addNewDevice(
+        newDevice: Device
     ): LiveData<DataState<MainViewState>> {
         return object : LiveData<DataState<MainViewState>>() {
             override fun onActive() {
@@ -33,7 +34,7 @@ constructor(
                 value = DataState.data(
                     data = MainViewState(
                         deviceFields = DeviceFields(
-                            deviceList = newList
+                            deviceList = mutableListOf(newDevice)
                         )
                     )
                 )
@@ -66,7 +67,7 @@ constructor(
                         data = MainViewState(
                             deviceFields = DeviceFields(
                                 deviceList = mutableListOf(
-                                    Device.builder(topic, message)
+                                    deviceBuilder(topic, message)
                                 )
                             )
                         )

@@ -27,7 +27,6 @@ class MainActivity : BaseActivity() {
             sessionManager.logout()
         }
         subscribeObservers()
-        initializeMqttSubscription()
         supportFragmentManager.beginTransaction()
             .replace(
                 R.id.fragment_container,
@@ -68,10 +67,6 @@ class MainActivity : BaseActivity() {
                 navAuthActivity()
             }
         })
-    }
-
-    private fun initializeMqttSubscription() {
-        viewModel.initializeMqttSubscription()
     }
 
     private fun navAuthActivity() {

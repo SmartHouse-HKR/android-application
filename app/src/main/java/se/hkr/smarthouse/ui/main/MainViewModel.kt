@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import se.hkr.smarthouse.models.Device
+import se.hkr.smarthouse.models.deviceBuilder
 import se.hkr.smarthouse.mqtt.MqttConnection
 import se.hkr.smarthouse.repository.main.MainRepository
 import se.hkr.smarthouse.ui.BaseViewModel
@@ -20,6 +20,10 @@ class MainViewModel
 constructor(
     val mainRepository: MainRepository
 ) : BaseViewModel<MainStateEvent, MainViewState>() {
+    init {
+        initializeMqttSubscription()
+    }
+
     override fun handleStateEvent(stateEvent: MainStateEvent): LiveData<DataState<MainViewState>> {
         // Temporary until the functionality is fixed
         return when (stateEvent) {
@@ -29,14 +33,14 @@ constructor(
                     stateEvent.message
                 )
             }
+            is MainStateEvent.UpdateDeviceListEvent -> {
+                mainRepository.addNewDevice(
+                    stateEvent.device
+                )
+            }
             is MainStateEvent.SubscribeAttemptEvent -> {
                 // TODO Implement subscribe using MVI as well
                 AbsentLiveData.create()
-            }
-            is MainStateEvent.UpdateDeviceListEvent -> {
-                mainRepository.updateDeviceList(
-                    stateEvent.list
-                )
             }
         }
     }
@@ -45,17 +49,19 @@ constructor(
         return MainViewState()
     }
 
-    fun initializeMqttSubscription() {
-        // TODO explore the idea of not doing this in the ViewModel and somehow have the repository
-        //  do it instead. Right now feeling like it is breaking the MVI pattern.
+    private fun initializeMqttSubscription() {
+        // Happening inside the ViewModel so that it does not happen more than once on
+        // configuration change. Should look into cleaning this up somehow at the end.
+        Log.d(BaseMainFragment.TAG, "Initializing MQTT subscription")
         MqttConnection.mqttClient.subscribe("${Constants.BASE_TOPIC}/#") { topic, message ->
-            Log.d(TAG, "MainViewModel: subscription received topic: $topic, message: $message")
+            Log.d(
+                BaseMainFragment.TAG,
+                "MainViewModel: subscription received topic: $topic, message: $message"
+            )
             GlobalScope.launch(Main) {
-                setDevicesFields(
-                    deviceFields = DeviceFields(
-                        deviceList = mutableListOf(
-                            Device.builder(topic, message.toString())
-                        )
+                setStateEvent(
+                    MainStateEvent.UpdateDeviceListEvent(
+                        device = deviceBuilder(topic, message.toString())
                     )
                 )
             }
@@ -85,9 +91,8 @@ constructor(
         if (newViewState.deviceFields == deviceFields) {
             return
         }
-        // TODO check if the ?. on the devices Fields and the !! on the list is okay to do.
         val newDevices = deviceFields.deviceList!!
-        newViewState.deviceFields?.addDevice(newDevices)
+        newViewState.deviceFields?.mergeLists(newDevices)
         setViewState(newViewState)
     }
 

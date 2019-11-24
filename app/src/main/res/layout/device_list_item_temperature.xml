@@ -39,7 +39,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="20dp"
-                android:clickable="false"
                 android:stepSize="0"
                 android:value="18"
                 android:valueFrom="-20"

@@ -1,6 +1,5 @@
 package se.hkr.smarthouse.ui.main.state
 
-import android.util.Log
 import se.hkr.smarthouse.models.Device
 
 const val TAG = "AppDebug"
@@ -14,32 +13,23 @@ data class MainViewState(
 data class DeviceFields(
     var deviceList: MutableList<Device>? = null
 ) {
-    fun addDevice(newDeviceList: MutableList<Device>) {
+    fun mergeLists(newDeviceList: MutableList<Device>) {
+        newDeviceList.forEach { addDevice(it) }
+    }
+
+    private fun addDevice(newDevice: Device) {
         if (deviceList == null) {
-            deviceList = newDeviceList
+            deviceList = mutableListOf(newDevice)
             return
         }
-        // Really unhappy with this, need to figure out how to do this using immutable lists later
-        var mutationsDone = 0
-        deviceList?.let {
-            deviceList?.forEachIndexed { oldListIndex, oldDevice ->
-                newDeviceList.forEachIndexed { newListIndex, newDevice ->
-                    if (oldDevice.topic == newDevice.topic) {
-                        deviceList!![oldListIndex] = newDeviceList[newListIndex]
-                        mutationsDone++
-                    }
-                }
+        deviceList!!.forEachIndexed { oldListIndex, oldDevice ->
+            if (oldDevice.topic == newDevice.topic) {
+                deviceList!![oldListIndex] = newDevice
+                return
             }
         }
-        if (mutationsDone != 0) {
-            return
-        }
-        if (newDeviceList.size != 0 && mutationsDone == 0) { // First condition might be redundant.
-            // This is called when there is a brand new topic to the list.
-            deviceList?.addAll(newDeviceList)
-            return
-        }
-        Log.e(TAG, "Tried to add device with list: {$newDeviceList}\nBut nothing happened")
+        deviceList!!.add(newDevice)
+        return
     }
 }
 

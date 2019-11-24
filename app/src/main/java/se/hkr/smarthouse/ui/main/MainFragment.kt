@@ -9,8 +9,6 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_main.*
 import se.hkr.smarthouse.R
-import se.hkr.smarthouse.models.Device
-import se.hkr.smarthouse.mqtt.Topics
 import se.hkr.smarthouse.ui.main.state.MainStateEvent
 import se.hkr.smarthouse.util.TopSpacingItemDecoration
 
@@ -35,7 +33,7 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
             Log.d(TAG, "MainFragment: new viewState $mainViewState")
             mainViewState.deviceFields?.let { devicesState ->
                 devicesState.deviceList?.let { devicesList ->
-                    Log.d(TAG, "MainFragment: updating list with: $devicesList")
+                    Log.d(TAG, "MainFragment: updating device with: $devicesList")
                     recyclerAdapter.apply {
                         submitList(devicesList)
                     }
@@ -52,12 +50,6 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
             adapter = recyclerAdapter
             addItemDecoration(topSpacingDecoration)
         }
-        // Initialize list with all possible hardcoded topics. Potentially make this dynamic later.
-        viewModel.setStateEvent(
-            MainStateEvent.UpdateDeviceListEvent(
-                list = Topics.allTopicsList
-            )
-        )
     }
 
     private fun publishTopic(
@@ -73,9 +65,8 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
         )
     }
 
-    override fun onDeviceStateChanged(item: Device) {
-        Log.d(TAG, "State of item ${item.getSimpleName()} changed to: $item")
-        val (topic, message) = item.asMqttMessage()
+    override fun onDeviceStateChanged(topic: String, message: String) {
+        Log.d(TAG, "Topic: $topic, sending message $message")
         publishTopic(topic, message)
     }
 }

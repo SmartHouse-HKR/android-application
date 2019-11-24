@@ -2,18 +2,15 @@ package se.hkr.smarthouse.ui.main
 
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.device_list_item_header.view.*
-import kotlinx.android.synthetic.main.device_list_item_interactive_on_off.view.*
-import kotlinx.android.synthetic.main.device_list_item_interactive_rgb.view.*
-import kotlinx.android.synthetic.main.device_list_item_interactive_temperature.view.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.models.Device
+import se.hkr.smarthouse.models.getSimpleName
 
 class DeviceListAdapter(
     private val interaction: Interaction
@@ -33,27 +30,33 @@ class DeviceListAdapter(
                     is Device.UnknownDevice -> {
                         return true
                     }
-                    is Device.InteractiveOnOff -> {
-                        newItem as Device.InteractiveOnOff
+                    is Device.Light -> {
+                        newItem as Device.Light
                         newItem.state == oldItem.state
                     }
-                    is Device.ObservableOnOff -> {
-                        newItem as Device.ObservableOnOff
+                    is Device.Temperature -> {
+                        newItem as Device.Temperature
+                        newItem.temperature == oldItem.temperature
+                    }
+                    is Device.Voltage -> {
+                        newItem as Device.Voltage
+                        newItem.voltage == oldItem.voltage
+                    }
+                    is Device.Oven -> {
+                        newItem as Device.Oven
                         newItem.state == oldItem.state
                     }
-                    is Device.InteractiveTemperature -> {
-                        newItem as Device.InteractiveTemperature
-                        newItem.temperature == oldItem.temperature
+                    is Device.Fan -> {
+                        newItem as Device.Fan
+                        newItem.speed == oldItem.speed
                     }
-                    is Device.ObservableTemperature -> {
-                        newItem as Device.ObservableTemperature
-                        newItem.temperature == oldItem.temperature
+                    is Device.Heater -> {
+                        newItem as Device.Heater
+                        newItem.state == oldItem.state && newItem.value == oldItem.value
                     }
-                    is Device.InteractiveRgb -> {
-                        newItem as Device.InteractiveRgb
-                        return (newItem.red == oldItem.red &&
-                                newItem.green == oldItem.green &&
-                                newItem.blue == oldItem.blue)
+                    is Device.Alarm -> {
+                        newItem as Device.Alarm
+                        newItem.active == oldItem.active && newItem.triggered == oldItem.triggered
                     }
                 }
             } catch (e: Exception) {
@@ -64,9 +67,9 @@ class DeviceListAdapter(
     }
 
     private val differ = object : AsyncListDiffer<Device>(this, diffCallback) {
-        // Have to override because if the list send to submitList is == to the old list, which
+        // Have to override because if the device send to submitList is == to the old device, which
         // is true since we are also updating the local variable whenever there is a change. We get
-        // around it by sending a copy of the list which does not return true on the == operation
+        // around it by sending a copy of the device which does not return true on the == operation
         // and therefore continues on the method and triggers the notifyDataSetChanged()
         override fun submitList(newList: List<Device>?, commitCallback: Runnable?) {
             super.submitList(newList?.toList(), commitCallback)
@@ -79,79 +82,99 @@ class DeviceListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
         return when (viewType) {
-            Device.UnknownDevice.IDENTIFIER -> {
-                EmptyViewHolder(
+            Device.Light.IDENTIFIER -> {
+                LightViewHolder(
                     LayoutInflater.from(parent.context).inflate(
-                        R.layout.device_list_item_empty, parent, false
-                    )
-                )
-            }
-            Device.InteractiveOnOff.IDENTIFIER -> {
-                InteractiveOnOffViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                        R.layout.device_list_item_interactive_on_off, parent, false
+                        R.layout.device_list_item_light, parent, false
                     ),
                     interaction
                 )
             }
-            Device.ObservableOnOff.IDENTIFIER -> {
-                ObservableOnOffViewHolder(
+            Device.Temperature.IDENTIFIER -> {
+                TemperatureViewHolder(
                     LayoutInflater.from(parent.context).inflate(
-                        R.layout.device_list_item_observable_on_off, parent, false
-                    )
-                )
-            }
-            Device.InteractiveTemperature.IDENTIFIER -> {
-                InteractiveTemperatureViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                        R.layout.device_list_item_interactive_temperature, parent, false
+                        R.layout.device_list_item_temperature, parent, false
                     ),
                     interaction
                 )
             }
-            Device.ObservableTemperature.IDENTIFIER -> {
-                ObservableTemperatureViewHolder(
+            Device.Voltage.IDENTIFIER -> {
+                VoltageViewHolder(
                     LayoutInflater.from(parent.context).inflate(
-                        R.layout.device_list_item_observable_temperature, parent, false
-                    )
-                )
-            }
-            Device.InteractiveRgb.IDENTIFIER -> {
-                InteractiveRgbViewHolder(
-                    LayoutInflater.from(parent.context).inflate(
-                        R.layout.device_list_item_interactive_rgb, parent, false
+                        R.layout.device_list_item_voltage, parent, false
                     ),
                     interaction
                 )
             }
-            else -> EmptyViewHolder(
-                LayoutInflater.from(parent.context).inflate(
-                    R.layout.device_list_item_empty, parent, false
+            Device.Oven.IDENTIFIER -> {
+                OvenViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.device_list_item_oven, parent, false
+                    ),
+                    interaction
                 )
-            )
+            }
+            Device.Fan.IDENTIFIER -> {
+                FanViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.device_list_item_fan, parent, false
+                    ),
+                    interaction
+                )
+            }
+            Device.Heater.IDENTIFIER -> {
+                HeaterViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.device_list_item_heater, parent, false
+                    ),
+                    interaction
+                )
+            }
+            Device.Alarm.IDENTIFIER -> {
+                AlarmViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.device_list_item_alarm, parent, false
+                    ),
+                    interaction
+                )
+            }
+            else -> {
+                UnknownDeviceViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.device_list_item_unknown, parent, false
+                    ),
+                    interaction
+                )
+            }
         }
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
-        val element = differ.currentList[position]
+        val device = differ.currentList[position]
         when (holder) {
-            is InteractiveOnOffViewHolder -> {
-                holder.bind(element as Device.InteractiveOnOff)
+            is UnknownDeviceViewHolder -> {
+                holder.bind(device as Device.UnknownDevice)
             }
-            is ObservableOnOffViewHolder -> {
-                holder.bind(element as Device.ObservableOnOff)
+            is LightViewHolder -> {
+                holder.bind(device as Device.Light)
             }
-            is InteractiveTemperatureViewHolder -> {
-                holder.bind(element as Device.InteractiveTemperature)
+            is TemperatureViewHolder -> {
+                holder.bind(device as Device.Temperature)
             }
-            is ObservableTemperatureViewHolder -> {
-                holder.bind(element as Device.ObservableTemperature)
+            is VoltageViewHolder -> {
+                holder.bind(device as Device.Voltage)
             }
-            is InteractiveRgbViewHolder -> {
-                holder.bind(element as Device.InteractiveRgb)
+            is OvenViewHolder -> {
+                holder.bind(device as Device.Oven)
             }
-            is EmptyViewHolder -> {
-                holder.bind(element)
+            is FanViewHolder -> {
+                holder.bind(device as Device.Fan)
+            }
+            is HeaterViewHolder -> {
+                holder.bind(device as Device.Heater)
+            }
+            is AlarmViewHolder -> {
+                holder.bind(device as Device.Alarm)
             }
             else -> throw IllegalArgumentException("Illegal bind view holder")
         }
@@ -160,11 +183,13 @@ class DeviceListAdapter(
     override fun getItemViewType(position: Int): Int {
         return when (differ.currentList[position]) {
             is Device.UnknownDevice -> Device.UnknownDevice.IDENTIFIER
-            is Device.InteractiveOnOff -> Device.InteractiveOnOff.IDENTIFIER
-            is Device.ObservableOnOff -> Device.ObservableOnOff.IDENTIFIER
-            is Device.InteractiveTemperature -> Device.InteractiveTemperature.IDENTIFIER
-            is Device.ObservableTemperature -> Device.ObservableTemperature.IDENTIFIER
-            is Device.InteractiveRgb -> Device.InteractiveRgb.IDENTIFIER
+            is Device.Light -> Device.Light.IDENTIFIER
+            is Device.Temperature -> Device.Temperature.IDENTIFIER
+            is Device.Voltage -> Device.Voltage.IDENTIFIER
+            is Device.Oven -> Device.Oven.IDENTIFIER
+            is Device.Fan -> Device.Fan.IDENTIFIER
+            is Device.Heater -> Device.Heater.IDENTIFIER
+            is Device.Alarm -> Device.Alarm.IDENTIFIER
         }
     }
 
@@ -173,138 +198,122 @@ class DeviceListAdapter(
     }
 
     fun submitList(list: List<Device>) {
-        differ.submitList(list) { Log.d(TAG, "adapter list submission done") }
+        differ.submitList(list) { Log.d(TAG, "adapter device submission done") }
     }
 
-    inner class EmptyViewHolder
+    inner class UnknownDeviceViewHolder
     constructor(
-        itemView: View
+        itemView: View,
+        interaction: Interaction
+    ) : BaseViewHolder<Device>(itemView) {
+
+        override fun bind(item: Device) {
+            val currentItem = item as Device.UnknownDevice
+            Log.d(TAG, "Binding UnknownDevice viewHolder: $currentItem")
+            itemView.deviceTopic.text = currentItem.topic
+            itemView.deviceName.text = currentItem.getSimpleName()
+            //TODO rest
+        }
+    }
+
+    inner class LightViewHolder
+    constructor(
+        itemView: View,
+        interaction: Interaction
+    ) : BaseViewHolder<Device>(itemView) {
+
+        override fun bind(item: Device) {
+            val currentItem = item as Device.Light
+            Log.d(TAG, "Binding Light viewHolder: $currentItem")
+            itemView.deviceTopic.text = currentItem.topic
+            itemView.deviceName.text = currentItem.getSimpleName()
+            //TODO rest
+        }
+    }
+
+    inner class TemperatureViewHolder
+    constructor(
+        itemView: View,
+        interaction: Interaction
+    ) : BaseViewHolder<Device>(itemView) {
+
+        override fun bind(item: Device) {
+            val currentItem = item as Device.Temperature
+            Log.d(TAG, "Binding Temperature viewHolder: $currentItem")
+            itemView.deviceTopic.text = currentItem.topic
+            itemView.deviceName.text = currentItem.getSimpleName()
+            //TODO rest
+        }
+    }
+
+    inner class VoltageViewHolder
+    constructor(
+        itemView: View,
+        interaction: Interaction
+    ) : BaseViewHolder<Device>(itemView) {
+
+        override fun bind(item: Device) {
+            val currentItem = item as Device.Voltage
+            Log.d(TAG, "Binding Voltage viewHolder: $currentItem")
+            itemView.deviceTopic.text = currentItem.topic
+            itemView.deviceName.text = currentItem.getSimpleName()
+            //TODO rest
+        }
+    }
+
+    inner class OvenViewHolder
+    constructor(
+        itemView: View,
+        interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
         override fun bind(item: Device) {
-            itemView.deviceTopic.text = "Unknown: ${item.topic}"
+            val currentItem = item as Device.Oven
+            Log.d(TAG, "Binding Oven viewHolder: $currentItem")
+            itemView.deviceTopic.text = currentItem.topic
+            itemView.deviceName.text = currentItem.getSimpleName()
+            //TODO rest
         }
     }
 
-    inner class InteractiveOnOffViewHolder
+    inner class FanViewHolder
     constructor(
         itemView: View,
-        private val interaction: Interaction
+        interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
-        override fun bind(item: Device) = with(itemView) {
-            val currentItem = item as Device.InteractiveOnOff
-            Log.d(TAG, "Binding interactive on/off: $currentItem")
-            itemView.deviceName.text = currentItem.getSimpleName()
+        override fun bind(item: Device) {
+            val currentItem = item as Device.Fan
+            Log.d(TAG, "Binding Fan viewHolder: $currentItem")
             itemView.deviceTopic.text = currentItem.topic
-            itemView.deviceSwitch.isChecked = currentItem.state
-            itemView.deviceSwitch.setOnClickListener {
-                currentItem.state = itemView.deviceSwitch.isChecked
-                interaction.onDeviceStateChanged(currentItem)
-            }
+            itemView.deviceName.text = currentItem.getSimpleName()
+            //TODO rest
         }
     }
 
-    inner class ObservableOnOffViewHolder
-    constructor(
-        itemView: View
-    ) : BaseViewHolder<Device>(itemView) {
-        override fun bind(item: Device) = with(itemView) {
-            val currentItem = item as Device.ObservableOnOff
-            Log.d(TAG, "Binding observable on/off: $currentItem")
-            itemView.deviceName.text = currentItem.getSimpleName()
-            itemView.deviceTopic.text = currentItem.topic
-            itemView.deviceSwitch.isChecked = currentItem.state
-        }
-    }
-
-    inner class InteractiveTemperatureViewHolder
+    inner class HeaterViewHolder
     constructor(
         itemView: View,
-        private val interaction: Interaction
+        interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
-        override fun bind(item: Device) = with(itemView) {
-            val currentItem = item as Device.InteractiveTemperature
-            Log.d(TAG, "Binding interactive temperature: $currentItem")
-            itemView.deviceName.text = currentItem.getSimpleName()
+        override fun bind(item: Device) {
+            val currentItem = item as Device.Heater
+            Log.d(TAG, "Binding Heater viewHolder: $currentItem")
             itemView.deviceTopic.text = currentItem.topic
-            itemView.deviceSlider.value = currentItem.temperature.toFloat()
-            itemView.deviceSlider.setOnChangeListener { _, value ->
-                val roundedFloat = String.format("%.2f", value)
-                currentItem.temperature = roundedFloat
-                itemView.textViewSliderValue.text = roundedFloat
-            }
-            itemView.deviceSlider.setOnTouchListener { _, event ->
-                if (event?.action == MotionEvent.ACTION_UP) {
-                    Log.d(TAG, "Slider released, sending new value ${currentItem.temperature}")
-                    interaction.onDeviceStateChanged(currentItem)
-                }
-                false
-            }
+            itemView.deviceName.text = currentItem.getSimpleName()
+            //TODO rest
         }
     }
 
-    inner class ObservableTemperatureViewHolder
-    constructor(
-        itemView: View
-    ) : BaseViewHolder<Device>(itemView) {
-        override fun bind(item: Device) = with(itemView) {
-            val currentItem = item as Device.ObservableTemperature
-            Log.d(TAG, "Binding observable temperature: $currentItem")
-            itemView.deviceName.text = currentItem.getSimpleName()
-            itemView.deviceTopic.text = currentItem.topic
-            itemView.deviceSlider.value = currentItem.temperature.toFloat()
-            itemView.deviceSlider.isClickable = false
-        }
-    }
-
-    inner class InteractiveRgbViewHolder
+    inner class AlarmViewHolder
     constructor(
         itemView: View,
-        private val interaction: Interaction
+        interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
-        override fun bind(item: Device) = with(itemView) {
-            val currentItem = item as Device.InteractiveRgb
-            Log.d(TAG, "Binding rgb: $currentItem")
-            itemView.deviceName.text = currentItem.getSimpleName()
+        override fun bind(item: Device) {
+            val currentItem = item as Device.Alarm
+            Log.d(TAG, "Binding Alarm viewHolder: $currentItem")
             itemView.deviceTopic.text = currentItem.topic
-            itemView.deviceSliderRed.value = currentItem.red.toFloat()
-            itemView.deviceSliderGreen.value = currentItem.green.toFloat()
-            itemView.deviceSliderBlue.value = currentItem.blue.toFloat()
-            itemView.deviceSliderRed.setOnChangeListener { _, value ->
-                val intValue = value.toInt()
-                currentItem.red = intValue
-                itemView.textViewRedValue.text = intValue.toString()
-            }
-            itemView.deviceSliderGreen.setOnChangeListener { _, value ->
-                val intValue = value.toInt()
-                currentItem.green = intValue
-                itemView.textViewGreenValue.text = intValue.toString()
-            }
-            itemView.deviceSliderBlue.setOnChangeListener { _, value ->
-                val intValue = value.toInt()
-                currentItem.blue = intValue
-                itemView.textViewBlueValue.text = intValue.toString()
-            }
-            itemView.deviceSliderRed.setOnTouchListener { _, event ->
-                if (event?.action == MotionEvent.ACTION_UP) {
-                    Log.d(TAG, "Slider released, sending new value ${currentItem.red}")
-                    interaction.onDeviceStateChanged(currentItem)
-                }
-                false
-            }
-            itemView.deviceSliderGreen.setOnTouchListener { _, event ->
-                if (event?.action == MotionEvent.ACTION_UP) {
-                    Log.d(TAG, "Slider released, sending new value ${currentItem.green}")
-                    interaction.onDeviceStateChanged(currentItem)
-                }
-                false
-            }
-            itemView.deviceSliderBlue.setOnTouchListener { _, event ->
-                if (event?.action == MotionEvent.ACTION_UP) {
-                    Log.d(TAG, "Slider released, sending new value ${currentItem.blue}")
-                    interaction.onDeviceStateChanged(currentItem)
-                }
-                false
-            }
+            itemView.deviceName.text = currentItem.getSimpleName()
+            //TODO rest
         }
     }
 
@@ -315,6 +324,6 @@ class DeviceListAdapter(
     }
 
     interface Interaction {
-        fun onDeviceStateChanged(item: Device)
+        fun onDeviceStateChanged(topic: String, message: String)
     }
 }

@@ -1,73 +1,11 @@
 package se.hkr.smarthouse.models
 
-import android.util.Log
-import se.hkr.smarthouse.mqtt.Topics
-
 const val TAG = "AppDebug"
 
+// One data class per different view inflated on the recycler view.
 sealed class Device(
     open val topic: String
 ) {
-    companion object {
-        fun builder(topic: String, message: String): Device {
-            return when (Topics.hashMap[topic.split("/").last()]) {
-                is InteractiveOnOff.Companion -> {
-                    InteractiveOnOff(topic = topic, state = message == "true")
-                }
-                is ObservableOnOff.Companion -> {
-                    ObservableOnOff(topic = topic, state = message == "true")
-                }
-                is InteractiveTemperature.Companion -> {
-                    InteractiveTemperature(topic = topic, temperature = message)
-                }
-                is ObservableTemperature.Companion -> {
-                    ObservableTemperature(topic = topic, temperature = message)
-                }
-                is InteractiveRgb.Companion -> {
-                    // Assumes format of "128 50 34" aka "R G B" where R is the number of Red etc.
-                    val colorsSplit = message.split(" ")
-                    InteractiveRgb(
-                        topic = topic,
-                        red = colorsSplit[0].toInt(),
-                        green = colorsSplit[1].toInt(),
-                        blue = colorsSplit[2].toInt()
-                    )
-                }
-                else -> {
-                    Log.e(TAG, "Device, unknown device type, check the hashMap values maybe")
-                    UnknownDevice(topic, message)
-                }
-            }
-        }
-    }
-
-    fun getSimpleName(): String {
-        return topic.split("/").last()
-    }
-
-    fun asMqttMessage(): Pair<String, String> {
-        return when (val device = this) { // Rename "this" to "device" for clarity
-            is UnknownDevice -> {
-                "" to ""
-            }
-            is InteractiveOnOff -> {
-                device.topic to if (device.state) "true" else "false"
-            }
-            is ObservableOnOff -> {
-                "" to ""
-            }
-            is InteractiveTemperature -> {
-                device.topic to device.temperature
-            }
-            is ObservableTemperature -> {
-                "" to ""
-            }
-            is InteractiveRgb -> {
-                device.topic to String.format("%d %d %d", device.red, device.green, device.blue)
-            }
-        }
-    }
-
     data class UnknownDevice(
         override val topic: String,
         var message: String = ""
@@ -77,7 +15,7 @@ sealed class Device(
         }
     }
 
-    data class InteractiveOnOff(
+    data class Light(
         override val topic: String,
         var state: Boolean = false
     ) : Device(topic) {
@@ -86,41 +24,115 @@ sealed class Device(
         }
     }
 
-    data class ObservableOnOff(
+    data class Temperature(
         override val topic: String,
-        var state: Boolean = false
+        var temperature: String = "0"
     ) : Device(topic) {
         companion object {
             const val IDENTIFIER = 1
         }
     }
 
-    data class InteractiveTemperature(
+    data class Voltage(
         override val topic: String,
-        var temperature: String = "0"
+        var voltage: String = "0"
     ) : Device(topic) {
         companion object {
             const val IDENTIFIER = 2
         }
     }
 
-    data class ObservableTemperature(
+    data class Oven(
         override val topic: String,
-        var temperature: String = "0"
+        var state: Boolean = false
     ) : Device(topic) {
         companion object {
             const val IDENTIFIER = 3
         }
     }
 
-    data class InteractiveRgb(
+    data class Fan(
         override val topic: String,
-        var red: Int = 0,
-        var green: Int = 0,
-        var blue: Int = 0
+        var speed: String = "0"
     ) : Device(topic) {
         companion object {
             const val IDENTIFIER = 4
         }
+    }
+
+    data class Heater(
+        override val topic: String,
+        var state: Boolean = false,
+        var value: String = "0"
+    ) : Device(topic) {
+        companion object {
+            const val IDENTIFIER = 5
+        }
+    }
+
+    data class Alarm(
+        override val topic: String,
+        var active: Boolean = false,
+        var triggered: Boolean = false
+    ) : Device(topic) {
+        companion object {
+            const val IDENTIFIER = 6
+        }
+    }
+}
+
+fun Device.getSimpleName(): String {
+    return topic.split("/").let { it[it.lastIndex - 1] }
+}
+
+fun topicToDevice(topic: String): Device {
+    val splitTopic = topic.split("/")
+    if (splitTopic.size != 3) { // Topic should ALWAYS 3 parts as described in the current protocol.
+        return Device.UnknownDevice(topic)
+    }
+    return when {
+        topic.contains("light") -> Device.Light(topic)
+        topic.contains("temperature") -> Device.Temperature(topic)
+        topic.contains("voltage") -> Device.Voltage(topic)
+        topic.contains("oven") -> Device.Oven(topic)
+        topic.contains("fan") -> Device.Fan(topic)
+        topic.contains("heater") -> Device.Heater(topic)
+        topic.contains("alarm") -> Device.Alarm(topic)
+        else -> Device.UnknownDevice(topic)
+    }
+}
+
+fun deviceBuilder(topic: String, message: String): Device {
+    val splitTopic = topic.split("/")
+    if (splitTopic.size != 3) { // Topic should ALWAYS 3 parts as described in the current protocol.
+        return Device.UnknownDevice(topic, message)
+    }
+    return when {
+        topic.contains("light") -> Device.Light(topic, (message == "on"))
+        topic.contains("temperature") -> Device.Temperature(topic, message)
+        topic.contains("voltage") -> Device.Voltage(topic, message)
+        topic.contains("oven") -> Device.Oven(topic, (message == "on"))
+        topic.contains("fan") -> Device.Fan(topic, message)
+        topic.contains("heater") -> {
+            when {
+                topic.contains("state") -> {
+                    Device.Heater(topic = topic, state = (message == "on"))
+                }
+                topic.contains("value") -> Device.Heater(topic = topic, value = message)
+                else -> Device.UnknownDevice(topic)
+            }
+        }
+        topic.contains("alarm") -> {
+            when {
+                topic.contains("state") -> {
+                    Device.Alarm(topic = topic, active = (message == "on"))
+                }
+                topic.contains("trigger") -> {
+                    Device.Alarm(topic = topic, triggered = (message == "true"))
+                }
+                else -> Device.UnknownDevice(topic)
+            }
+        }
+        else -> Device.UnknownDevice(topic)
     }
 }
