@@ -24,6 +24,7 @@ object MqttConnection {
             Log.d(TAG, "MqttConnection: publishing: topic: $topic, message: $message")
             val mqttMessage = MqttMessage(message.toByteArray())
             mqttMessage.qos = Constants.QOS
+            mqttMessage.isRetained = true
             mqttClient.publish(topic, mqttMessage)
             liveData.value = MqttConnectionResponse(true)
             Log.d(TAG, "Mqtt connection success")
