@@ -4,10 +4,10 @@ const val TAG = "AppDebug"
 
 // One data class per different view inflated on the recycler view.
 sealed class Device(
-    open val topic: String
+    open var topic: String
 ) {
     data class UnknownDevice(
-        override val topic: String,
+        override var topic: String,
         var message: String = ""
     ) : Device(topic) {
         companion object {
@@ -16,7 +16,7 @@ sealed class Device(
     }
 
     data class Light(
-        override val topic: String,
+        override var topic: String,
         var state: Boolean = false
     ) : Device(topic) {
         companion object {
@@ -25,7 +25,7 @@ sealed class Device(
     }
 
     data class Temperature(
-        override val topic: String,
+        override var topic: String,
         var temperature: String = "0"
     ) : Device(topic) {
         companion object {
@@ -34,7 +34,7 @@ sealed class Device(
     }
 
     data class Voltage(
-        override val topic: String,
+        override var topic: String,
         var voltage: String = "0"
     ) : Device(topic) {
         companion object {
@@ -43,7 +43,7 @@ sealed class Device(
     }
 
     data class Oven(
-        override val topic: String,
+        override var topic: String,
         var state: Boolean = false
     ) : Device(topic) {
         companion object {
@@ -52,7 +52,7 @@ sealed class Device(
     }
 
     data class Fan(
-        override val topic: String,
+        override var topic: String,
         var speed: String = "0"
     ) : Device(topic) {
         companion object {
@@ -61,9 +61,9 @@ sealed class Device(
     }
 
     data class Heater(
-        override val topic: String,
-        var state: Boolean = false,
-        var value: String = "0"
+        override var topic: String,
+        var state: Boolean? = null,
+        var value: String? = null
     ) : Device(topic) {
         companion object {
             const val IDENTIFIER = 5
@@ -71,9 +71,9 @@ sealed class Device(
     }
 
     data class Alarm(
-        override val topic: String,
-        var active: Boolean = false,
-        var triggered: Boolean = false
+        override var topic: String,
+        var active: Boolean? = null,
+        var triggered: Boolean? = null
     ) : Device(topic) {
         companion object {
             const val IDENTIFIER = 6
@@ -82,7 +82,7 @@ sealed class Device(
 }
 
 fun Device.getSimpleName(): String {
-    return topic.split("/").let { it[it.lastIndex - 1] }
+    return topic.split("/").last()
 }
 
 fun topicToDevice(topic: String): Device {
@@ -107,7 +107,7 @@ fun deviceBuilder(topic: String, message: String): Device {
     if (splitTopic.size != 3) { // Topic should ALWAYS 3 parts as described in the current protocol.
         return Device.UnknownDevice(topic, message)
     }
-    return when {
+    val newDevice = when {
         topic.contains("light") -> Device.Light(topic, (message == "on"))
         topic.contains("temperature") -> Device.Temperature(topic, message)
         topic.contains("voltage") -> Device.Voltage(topic, message)
@@ -135,4 +135,6 @@ fun deviceBuilder(topic: String, message: String): Device {
         }
         else -> Device.UnknownDevice(topic)
     }
+    newDevice.topic = newDevice.topic.split("/").take(2).joinToString(separator = "/")
+    return newDevice
 }

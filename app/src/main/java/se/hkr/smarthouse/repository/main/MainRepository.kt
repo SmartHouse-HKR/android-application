@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.Job
 import se.hkr.smarthouse.models.Device
-import se.hkr.smarthouse.models.deviceBuilder
 import se.hkr.smarthouse.mqtt.MqttConnection
 import se.hkr.smarthouse.mqtt.responses.MqttConnectionResponse
 import se.hkr.smarthouse.repository.NetworkBoundResource
@@ -64,13 +63,13 @@ constructor(
                 }
                 onCompleteJob(
                     DataState.data(
-                        data = MainViewState(
+                        /*data = MainViewState(
                             deviceFields = DeviceFields(
                                 deviceList = mutableListOf(
                                     deviceBuilder(topic, message)
                                 )
                             )
-                        )
+                        )*/
                     )
                 )
             }

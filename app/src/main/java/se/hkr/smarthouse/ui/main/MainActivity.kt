@@ -42,11 +42,6 @@ class MainActivity : BaseActivity() {
             dataState.data?.let { data ->
                 data.data?.let { dataEvent ->
                     dataEvent.getContentIfNotHandled()?.let { eventContent ->
-                        // TODO subscribeTopics?
-                        /*eventContent.publishFields?.let { publishFields ->
-                            Log.d(TAG, "MainActivity: new publishFields: $publishFields")
-                            viewModel.setPublishFields(publishFields)
-                        }*/
                         eventContent.deviceFields?.let { devicesState ->
                             Log.d(TAG, "MainActivity: new deviceFields: $devicesState")
                             viewModel.setDevicesFields(devicesState)

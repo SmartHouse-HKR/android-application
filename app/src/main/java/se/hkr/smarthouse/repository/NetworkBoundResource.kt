@@ -31,7 +31,7 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
 
     init {
         setJob(initNewJob())
-        result.value = DataState.loading(isLoading = true, cachedData = null)
+        result.value = DataState.loading()
         if (isNetworkAvailable) {
             // This starts along with the coroutine below
             coroutineScope.launch {

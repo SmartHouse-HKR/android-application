@@ -24,12 +24,30 @@ data class DeviceFields(
         }
         deviceList!!.forEachIndexed { oldListIndex, oldDevice ->
             if (oldDevice.topic == newDevice.topic) {
-                deviceList!![oldListIndex] = newDevice
+                deviceList!![oldListIndex] = mergeDevice(oldDevice, newDevice)
                 return
             }
         }
         deviceList!!.add(newDevice)
         return
+    }
+
+    private fun <T : Device> mergeDevice(oldDevice: T, newDevice: T): T {
+        return when (newDevice) {
+            is Device.Heater -> {
+                oldDevice as Device.Heater
+                if (newDevice.state == null) newDevice.state = oldDevice.state
+                if (newDevice.value == null) newDevice.value = oldDevice.value
+                newDevice
+            }
+            is Device.Alarm -> {
+                oldDevice as Device.Alarm
+                if (newDevice.active == null) newDevice.active = oldDevice.active
+                if (newDevice.triggered == null) newDevice.triggered = oldDevice.triggered
+                newDevice
+            }
+            else -> newDevice
+        }
     }
 }
 

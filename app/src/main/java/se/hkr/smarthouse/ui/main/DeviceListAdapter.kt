@@ -21,7 +21,7 @@ class DeviceListAdapter(
 
     private val diffCallback = object : DiffUtil.ItemCallback<Device>() {
         override fun areItemsTheSame(oldItem: Device, newItem: Device): Boolean {
-            return oldItem.topic == newItem.topic
+            return oldItem.topic.split("/").take(2) == newItem.topic.split("/").take(2)
         }
 
         override fun areContentsTheSame(oldItem: Device, newItem: Device): Boolean {
