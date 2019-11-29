@@ -14,6 +14,7 @@ import kotlinx.android.synthetic.main.device_list_item_fan.view.*
 import kotlinx.android.synthetic.main.device_list_item_header.view.*
 import kotlinx.android.synthetic.main.device_list_item_heater.view.*
 import kotlinx.android.synthetic.main.device_list_item_oven.view.*
+import kotlinx.android.synthetic.main.device_list_item_temperature.view.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.models.Device
 import se.hkr.smarthouse.models.getSimpleName
@@ -99,7 +100,7 @@ class DeviceListAdapter(
                 TemperatureViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_temperature, parent, false
-                    ), interaction
+                    )
                 )
             }
             Device.Voltage.IDENTIFIER -> {
@@ -215,8 +216,7 @@ class DeviceListAdapter(
 
     inner class TemperatureViewHolder
     constructor(
-        itemView: View,
-        private val interaction: Interaction
+        itemView: View
     ) : BaseViewHolder<Device>(itemView) {
 
         override fun bind(item: Device) {
@@ -224,7 +224,10 @@ class DeviceListAdapter(
             Log.d(TAG, "Binding Temperature viewHolder: $currentItem")
             itemView.deviceTopic.text = currentItem.topic
             itemView.deviceName.text = currentItem.getSimpleName()
-            //TODO rest
+            itemView.textViewTemperatureValue.text = currentItem.temperature
+            itemView.temperatureDeviceSlider.value = currentItem.temperature.toFloat()
+            // Make it not clickable by consuming the touch event and doing nothing with it
+            itemView.temperatureDeviceSlider.setOnTouchListener { _, _ -> true }
         }
     }
 
