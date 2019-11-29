@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.device_list_item_alarm.view.*
 import kotlinx.android.synthetic.main.device_list_item_fan.view.*
 import kotlinx.android.synthetic.main.device_list_item_header.view.*
 import kotlinx.android.synthetic.main.device_list_item_heater.view.*
+import kotlinx.android.synthetic.main.device_list_item_light.view.*
 import kotlinx.android.synthetic.main.device_list_item_oven.view.*
 import kotlinx.android.synthetic.main.device_list_item_temperature.view.*
 import se.hkr.smarthouse.R
@@ -205,7 +206,13 @@ class DeviceListAdapter(
             Log.d(TAG, "Binding Light viewHolder: $item")
             itemView.text_device_topic.text = item.topic
             itemView.text_device_name.text = item.getSimpleName()
-            //TODO rest
+            itemView.switch_light_state.isChecked = item.state
+            itemView.switch_light_state.setOnClickListener {
+                interaction.onDeviceStateChanged(
+                    "${item.topic}/state",
+                    if (itemView.switch_light_state.isChecked) "on" else "off"
+                )
+            }
         }
     }
 
