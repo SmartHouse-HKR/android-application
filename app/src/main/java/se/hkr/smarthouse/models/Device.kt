@@ -91,7 +91,22 @@ fun deviceBuilder(topic: String, message: String): Device {
         return Device.UnknownDevice(topic, message)
     }
     val newDevice = when {
-        topic.contains("light") -> Device.Light(topic, (message == "on"))
+        topic.contains("light") -> {
+            when {
+                topic.contains("outdoor") -> {
+                    when {
+                        topic.contains("state") -> {
+                            Device.Alarm(topic = topic, active = (message == "on"))
+                        }
+                        topic.contains("trigger") -> {
+                            Device.Alarm(topic = topic, triggered = (message == "true"))
+                        }
+                        else -> Device.UnknownDevice(topic, message)
+                    }
+                }
+                else -> Device.Light(topic, (message == "on"))
+            }
+        }
         topic.contains("temperature") -> Device.Temperature(topic, message)
         topic.contains("voltage") -> Device.Voltage(topic, message)
         topic.contains("oven") -> Device.Oven(topic, (message == "on"))
