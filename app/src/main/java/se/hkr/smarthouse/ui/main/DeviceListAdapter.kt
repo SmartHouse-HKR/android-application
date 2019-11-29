@@ -2,6 +2,7 @@ package se.hkr.smarthouse.ui.main
 
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.device_list_item_alarm.view.*
 import kotlinx.android.synthetic.main.device_list_item_fan.view.*
 import kotlinx.android.synthetic.main.device_list_item_header.view.*
+import kotlinx.android.synthetic.main.device_list_item_heater.view.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.models.Device
 import se.hkr.smarthouse.models.getSimpleName
@@ -301,7 +303,27 @@ class DeviceListAdapter(
             Log.d(TAG, "Binding Heater viewHolder: $currentItem")
             itemView.deviceTopic.text = currentItem.topic
             itemView.deviceName.text = currentItem.getSimpleName()
-            //TODO rest
+            itemView.heaterActivatedSwitch.isChecked = currentItem.state ?: false
+            itemView.heaterActivatedSwitch.setOnClickListener {
+                interaction.onDeviceStateChanged(
+                    "${currentItem.topic}/state",
+                    if (itemView.heaterActivatedSwitch.isChecked) "on" else "off"
+                )
+            }
+            itemView.textViewSliderValue.text = currentItem.value ?: "0"
+            itemView.deviceSlider.value = currentItem.value?.toFloat() ?: 0f
+            itemView.deviceSlider.setOnChangeListener { _, value ->
+                itemView.textViewSliderValue.text = String.format("%.2f", value)
+            }
+            itemView.deviceSlider.setOnTouchListener { _, event ->
+                if (event?.action == MotionEvent.ACTION_UP) {
+                    interaction.onDeviceStateChanged(
+                        "${currentItem.topic}/value",
+                        itemView.textViewSliderValue.text.toString()
+                    )
+                }
+                false
+            }
         }
     }
 
@@ -319,7 +341,7 @@ class DeviceListAdapter(
             itemView.triggeredSwitch.isChecked = currentItem.triggered ?: false
             itemView.activatedSwitch.setOnClickListener {
                 interaction.onDeviceStateChanged(
-                    "${item.topic}/state",
+                    "${currentItem.topic}/state",
                     if (itemView.activatedSwitch.isChecked) "on" else "off"
                 )
             }
