@@ -9,35 +9,35 @@
         android:layout_height="wrap_content">
 
         <include
-            android:id="@+id/deviceHeader"
+            android:id="@+id/device_list_item_header"
             layout="@layout/device_list_item_header"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Switch
-            android:id="@+id/heaterActivatedSwitch"
+            android:id="@+id/switch_heater_activate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:text="activated"
-            app:layout_constraintBottom_toTopOf="@+id/sliderConstraintLayout"
+            app:layout_constraintBottom_toTopOf="@+id/constraint_layout_heater_value"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/deviceHeader" />
+            app:layout_constraintTop_toBottomOf="@+id/device_list_item_header" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/sliderConstraintLayout"
+            android:id="@+id/constraint_layout_heater_value"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/heaterActivatedSwitch">
+            app:layout_constraintTop_toBottomOf="@+id/switch_heater_activate">
 
             <TextView
-                android:id="@+id/textViewSlider"
+                android:id="@+id/text_heater_unit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -47,7 +47,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.slider.Slider
-                android:id="@+id/deviceSlider"
+                android:id="@+id/slider_heater_value"
                 style="@style/slider_yellow"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -56,13 +56,13 @@
                 android:value="18"
                 android:valueFrom="-20"
                 android:valueTo="40"
-                app:layout_constraintEnd_toStartOf="@+id/textViewSliderValue"
-                app:layout_constraintStart_toEndOf="@+id/textViewSlider"
+                app:layout_constraintEnd_toStartOf="@+id/text_heater_value"
+                app:layout_constraintStart_toEndOf="@+id/text_heater_unit"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textViewSliderValue"
+                android:id="@+id/text_heater_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"

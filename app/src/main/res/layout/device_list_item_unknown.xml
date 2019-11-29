@@ -9,7 +9,7 @@
         android:layout_height="wrap_content">
 
         <include
-            android:id="@+id/deviceHeader"
+            android:id="@+id/device_list_item_header"
             layout="@layout/device_list_item_header"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -6,7 +6,7 @@
     android:layout_margin="10dp">
 
     <TextView
-        android:id="@+id/deviceTopic"
+        android:id="@+id/text_device_topic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/deviceName"
+        android:id="@+id/text_device_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"

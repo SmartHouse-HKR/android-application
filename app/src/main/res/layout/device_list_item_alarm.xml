@@ -9,22 +9,22 @@
         android:layout_height="wrap_content">
 
         <include
-            android:id="@+id/deviceHeader"
+            android:id="@+id/device_list_item_header"
             layout="@layout/device_list_item_header" />
 
         <Switch
-            android:id="@+id/activatedSwitch"
+            android:id="@+id/switch_alarm_activate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:text="activated"
-            app:layout_constraintBottom_toTopOf="@+id/triggeredSwitch"
+            app:layout_constraintBottom_toTopOf="@+id/switch_alarm_trigger"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/deviceHeader" />
+            app:layout_constraintTop_toBottomOf="@+id/device_list_item_header" />
 
         <Switch
-            android:id="@+id/triggeredSwitch"
+            android:id="@+id/switch_alarm_trigger"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -33,7 +33,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/activatedSwitch" />
+            app:layout_constraintTop_toBottomOf="@+id/switch_alarm_activate" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>
