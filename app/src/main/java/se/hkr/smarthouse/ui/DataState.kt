@@ -17,7 +17,7 @@ data class DataState<T>(
         }
 
         fun <T> loading(
-            isLoading: Boolean,
+            isLoading: Boolean = true,
             cachedData: T? = null
         ): DataState<T> {
             return DataState(

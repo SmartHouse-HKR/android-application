@@ -9,19 +9,12 @@
         android:layout_height="wrap_content">
 
         <include
-            android:id="@+id/deviceHeader"
-            layout="@layout/device_list_item_header" />
-
-        <Switch
-            android:id="@+id/deviceSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:clickable="false"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/device_list_item_header"
+            layout="@layout/device_list_item_header"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/deviceHeader" />
+            app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

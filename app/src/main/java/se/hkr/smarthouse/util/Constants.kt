@@ -9,7 +9,7 @@ class Constants {
         const val LOGIN_EMAIL = "fast@fast.se"
         const val LOGIN_PASS = "fast"
 
-        const val BASE_TOPIC = "Smarthome"
+        const val BASE_TOPIC = "smarthouse"
         const val QOS = 2 // We always must make sure what we send is received to improve UX
     }
 }

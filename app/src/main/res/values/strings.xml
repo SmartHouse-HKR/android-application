@@ -19,4 +19,11 @@
     <string name="host_url">Host Url</string>
     <string name="topic">Topic</string>
     <string name="subscribe">Subscribe</string>
+
+    <string-array name="fan_speed_array">
+        <item>0%</item>
+        <item>50%</item>
+        <item>75%</item>
+        <item>100%</item>
+    </string-array>
 </resources>
