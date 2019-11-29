@@ -4,9 +4,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.device_list_item_alarm.view.*
+import kotlinx.android.synthetic.main.device_list_item_fan.view.*
 import kotlinx.android.synthetic.main.device_list_item_header.view.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.models.Device
@@ -86,64 +89,56 @@ class DeviceListAdapter(
                 LightViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_light, parent, false
-                    ),
-                    interaction
+                    ), interaction
                 )
             }
             Device.Temperature.IDENTIFIER -> {
                 TemperatureViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_temperature, parent, false
-                    ),
-                    interaction
+                    ), interaction
                 )
             }
             Device.Voltage.IDENTIFIER -> {
                 VoltageViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_voltage, parent, false
-                    ),
-                    interaction
+                    ), interaction
                 )
             }
             Device.Oven.IDENTIFIER -> {
                 OvenViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_oven, parent, false
-                    ),
-                    interaction
+                    ), interaction
                 )
             }
             Device.Fan.IDENTIFIER -> {
                 FanViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_fan, parent, false
-                    ),
-                    interaction
+                    ), interaction
                 )
             }
             Device.Heater.IDENTIFIER -> {
                 HeaterViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_heater, parent, false
-                    ),
-                    interaction
+                    ), interaction
                 )
             }
             Device.Alarm.IDENTIFIER -> {
                 AlarmViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_alarm, parent, false
-                    ),
-                    interaction
+                    ), interaction
                 )
             }
             else -> {
                 UnknownDeviceViewHolder(
                     LayoutInflater.from(parent.context).inflate(
                         R.layout.device_list_item_unknown, parent, false
-                    ),
-                    interaction
+                    ), interaction
                 )
             }
         }
@@ -152,30 +147,14 @@ class DeviceListAdapter(
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
         val device = differ.currentList[position]
         when (holder) {
-            is UnknownDeviceViewHolder -> {
-                holder.bind(device as Device.UnknownDevice)
-            }
-            is LightViewHolder -> {
-                holder.bind(device as Device.Light)
-            }
-            is TemperatureViewHolder -> {
-                holder.bind(device as Device.Temperature)
-            }
-            is VoltageViewHolder -> {
-                holder.bind(device as Device.Voltage)
-            }
-            is OvenViewHolder -> {
-                holder.bind(device as Device.Oven)
-            }
-            is FanViewHolder -> {
-                holder.bind(device as Device.Fan)
-            }
-            is HeaterViewHolder -> {
-                holder.bind(device as Device.Heater)
-            }
-            is AlarmViewHolder -> {
-                holder.bind(device as Device.Alarm)
-            }
+            is UnknownDeviceViewHolder -> holder.bind(device)
+            is LightViewHolder -> holder.bind(device)
+            is TemperatureViewHolder -> holder.bind(device)
+            is VoltageViewHolder -> holder.bind(device)
+            is OvenViewHolder -> holder.bind(device)
+            is FanViewHolder -> holder.bind(device)
+            is HeaterViewHolder -> holder.bind(device)
+            is AlarmViewHolder -> holder.bind(device)
             else -> throw IllegalArgumentException("Illegal bind view holder")
         }
     }
@@ -204,7 +183,7 @@ class DeviceListAdapter(
     inner class UnknownDeviceViewHolder
     constructor(
         itemView: View,
-        interaction: Interaction
+        private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
 
         override fun bind(item: Device) {
@@ -219,7 +198,7 @@ class DeviceListAdapter(
     inner class LightViewHolder
     constructor(
         itemView: View,
-        interaction: Interaction
+        private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
 
         override fun bind(item: Device) {
@@ -234,7 +213,7 @@ class DeviceListAdapter(
     inner class TemperatureViewHolder
     constructor(
         itemView: View,
-        interaction: Interaction
+        private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
 
         override fun bind(item: Device) {
@@ -249,7 +228,7 @@ class DeviceListAdapter(
     inner class VoltageViewHolder
     constructor(
         itemView: View,
-        interaction: Interaction
+        private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
 
         override fun bind(item: Device) {
@@ -264,7 +243,7 @@ class DeviceListAdapter(
     inner class OvenViewHolder
     constructor(
         itemView: View,
-        interaction: Interaction
+        private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
         override fun bind(item: Device) {
             val currentItem = item as Device.Oven
@@ -278,21 +257,44 @@ class DeviceListAdapter(
     inner class FanViewHolder
     constructor(
         itemView: View,
-        interaction: Interaction
+        private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
         override fun bind(item: Device) {
             val currentItem = item as Device.Fan
             Log.d(TAG, "Binding Fan viewHolder: $currentItem")
             itemView.deviceTopic.text = currentItem.topic
             itemView.deviceName.text = currentItem.getSimpleName()
-            //TODO rest
+            val itemsArray = itemView.context.resources.getStringArray(R.array.fan_speed_array)
+            // This assumes that .speed will always be 0/50/75/100, otherwise just shows 0%
+            itemView.speedSpinner.setSelection(
+                itemsArray.indexOfFirst { arrayItem ->
+                    arrayItem.removeSuffix("%") == currentItem.speed
+                }, false
+            )
+            itemView.speedSpinner.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>,
+                        view: View,
+                        pos: Int,
+                        id: Long
+                    ) {
+                        Log.d(TAG, "itemSelected pos: ${itemsArray[pos]}")
+                        interaction.onDeviceStateChanged(
+                            "${item.topic}/speed",
+                            itemsArray[pos].removeSuffix("%")
+                        )
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>) {}
+                }
         }
     }
 
     inner class HeaterViewHolder
     constructor(
         itemView: View,
-        interaction: Interaction
+        private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
         override fun bind(item: Device) {
             val currentItem = item as Device.Heater
@@ -306,14 +308,21 @@ class DeviceListAdapter(
     inner class AlarmViewHolder
     constructor(
         itemView: View,
-        interaction: Interaction
+        private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
         override fun bind(item: Device) {
             val currentItem = item as Device.Alarm
             Log.d(TAG, "Binding Alarm viewHolder: $currentItem")
             itemView.deviceTopic.text = currentItem.topic
             itemView.deviceName.text = currentItem.getSimpleName()
-            //TODO rest
+            itemView.activatedSwitch.isChecked = currentItem.active ?: false
+            itemView.triggeredSwitch.isChecked = currentItem.triggered ?: false
+            itemView.activatedSwitch.setOnClickListener {
+                interaction.onDeviceStateChanged(
+                    "${item.topic}/state",
+                    if (itemView.activatedSwitch.isChecked) "on" else "off"
+                )
+            }
         }
     }
 

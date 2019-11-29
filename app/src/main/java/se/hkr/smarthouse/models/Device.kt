@@ -85,23 +85,6 @@ fun Device.getSimpleName(): String {
     return topic.split("/").last()
 }
 
-fun topicToDevice(topic: String): Device {
-    val splitTopic = topic.split("/")
-    if (splitTopic.size != 3) { // Topic should ALWAYS 3 parts as described in the current protocol.
-        return Device.UnknownDevice(topic)
-    }
-    return when {
-        topic.contains("light") -> Device.Light(topic)
-        topic.contains("temperature") -> Device.Temperature(topic)
-        topic.contains("voltage") -> Device.Voltage(topic)
-        topic.contains("oven") -> Device.Oven(topic)
-        topic.contains("fan") -> Device.Fan(topic)
-        topic.contains("heater") -> Device.Heater(topic)
-        topic.contains("alarm") -> Device.Alarm(topic)
-        else -> Device.UnknownDevice(topic)
-    }
-}
-
 fun deviceBuilder(topic: String, message: String): Device {
     val splitTopic = topic.split("/")
     if (splitTopic.size != 3) { // Topic should ALWAYS 3 parts as described in the current protocol.

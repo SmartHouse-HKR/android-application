@@ -12,11 +12,12 @@
             android:id="@+id/deviceHeader"
             layout="@layout/device_list_item_header" />
 
-        <Switch
-            android:id="@+id/deviceSwitch"
+        <Spinner
+            android:id="@+id/speedSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
+            android:layout_margin="10dp"
+            android:entries="@array/fan_speed_array"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -13,7 +13,7 @@
             layout="@layout/device_list_item_header" />
 
         <Switch
-            android:id="@+id/deviceSwitch"
+            android:id="@+id/stateSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
