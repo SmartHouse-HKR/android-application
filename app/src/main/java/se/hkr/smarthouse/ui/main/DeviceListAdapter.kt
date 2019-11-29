@@ -236,11 +236,10 @@ class DeviceListAdapter(
         itemView: View,
         private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
-        override fun bind(item: Device) {
-            val currentItem = item as Device.Voltage
-            Log.d(TAG, "Binding Voltage viewHolder: $currentItem")
-            itemView.text_device_topic.text = currentItem.topic
-            itemView.text_device_name.text = currentItem.getSimpleName()
+        override fun bind(item: Device) = with(item as Device.Voltage) {
+            Log.d(TAG, "Binding Voltage viewHolder: $item")
+            itemView.text_device_topic.text = item.topic
+            itemView.text_device_name.text = item.getSimpleName()
             //TODO rest
         }
     }
@@ -250,15 +249,14 @@ class DeviceListAdapter(
         itemView: View,
         private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
-        override fun bind(item: Device) {
-            val currentItem = item as Device.Oven
-            Log.d(TAG, "Binding Oven viewHolder: $currentItem")
-            itemView.text_device_topic.text = currentItem.topic
-            itemView.text_device_name.text = currentItem.getSimpleName()
-            itemView.switch_oven_state.isChecked = currentItem.state
+        override fun bind(item: Device) = with(item as Device.Oven) {
+            Log.d(TAG, "Binding Oven viewHolder: $item")
+            itemView.text_device_topic.text = item.topic
+            itemView.text_device_name.text = item.getSimpleName()
+            itemView.switch_oven_state.isChecked = item.state
             itemView.switch_oven_state.setOnClickListener {
                 interaction.onDeviceStateChanged(
-                    "${currentItem.topic}/state",
+                    "${item.topic}/state",
                     if (itemView.switch_oven_state.isChecked) "on" else "off"
                 )
             }
@@ -270,16 +268,15 @@ class DeviceListAdapter(
         itemView: View,
         private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
-        override fun bind(item: Device) {
-            val currentItem = item as Device.Fan
-            Log.d(TAG, "Binding Fan viewHolder: $currentItem")
-            itemView.text_device_topic.text = currentItem.topic
-            itemView.text_device_name.text = currentItem.getSimpleName()
+        override fun bind(item: Device) = with(item as Device.Fan) {
+            Log.d(TAG, "Binding Fan viewHolder: $item")
+            itemView.text_device_topic.text = item.topic
+            itemView.text_device_name.text = item.getSimpleName()
             val itemsArray = itemView.context.resources.getStringArray(R.array.fan_speed_array)
             // This assumes that .speed will always be 0/50/75/100, otherwise just shows 0%
             itemView.spinner_fan_speed.setSelection(
                 itemsArray.indexOfFirst { arrayItem ->
-                    arrayItem.removeSuffix("%") == currentItem.speed
+                    arrayItem.removeSuffix("%") == item.speed
                 }, false
             )
             itemView.spinner_fan_speed.onItemSelectedListener =
@@ -307,27 +304,26 @@ class DeviceListAdapter(
         itemView: View,
         private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
-        override fun bind(item: Device) {
-            val currentItem = item as Device.Heater
-            Log.d(TAG, "Binding Heater viewHolder: $currentItem")
-            itemView.text_device_topic.text = currentItem.topic
-            itemView.text_device_name.text = currentItem.getSimpleName()
-            itemView.switch_heater_activate.isChecked = currentItem.state ?: false
+        override fun bind(item: Device) = with(item as Device.Heater) {
+            Log.d(TAG, "Binding Heater viewHolder: $item")
+            itemView.text_device_topic.text = item.topic
+            itemView.text_device_name.text = item.getSimpleName()
+            itemView.switch_heater_activate.isChecked = item.state ?: false
             itemView.switch_heater_activate.setOnClickListener {
                 interaction.onDeviceStateChanged(
-                    "${currentItem.topic}/state",
+                    "${item.topic}/state",
                     if (itemView.switch_heater_activate.isChecked) "on" else "off"
                 )
             }
-            itemView.text_heater_value.text = currentItem.value ?: "0"
-            itemView.slider_heater_value.value = currentItem.value?.toFloat() ?: 0f
+            itemView.text_heater_value.text = item.value ?: "0"
+            itemView.slider_heater_value.value = item.value?.toFloat() ?: 0f
             itemView.slider_heater_value.setOnChangeListener { _, value ->
                 itemView.text_heater_value.text = String.format("%.2f", value)
             }
             itemView.slider_heater_value.setOnTouchListener { _, event ->
                 if (event?.action == MotionEvent.ACTION_UP) {
                     interaction.onDeviceStateChanged(
-                        "${currentItem.topic}/value",
+                        "${item.topic}/value",
                         itemView.text_heater_value.text.toString()
                     )
                 }
@@ -341,16 +337,15 @@ class DeviceListAdapter(
         itemView: View,
         private val interaction: Interaction
     ) : BaseViewHolder<Device>(itemView) {
-        override fun bind(item: Device) {
-            val currentItem = item as Device.Alarm
-            Log.d(TAG, "Binding Alarm viewHolder: $currentItem")
-            itemView.text_device_topic.text = currentItem.topic
-            itemView.text_device_name.text = currentItem.getSimpleName()
-            itemView.switch_alarm_activate.isChecked = currentItem.active ?: false
-            itemView.switch_alarm_trigger.isChecked = currentItem.triggered ?: false
+        override fun bind(item: Device) = with(item as Device.Alarm) {
+            Log.d(TAG, "Binding Alarm viewHolder: $item")
+            itemView.text_device_topic.text = item.topic
+            itemView.text_device_name.text = item.getSimpleName()
+            itemView.switch_alarm_activate.isChecked = item.active ?: false
+            itemView.switch_alarm_trigger.isChecked = item.triggered ?: false
             itemView.switch_alarm_activate.setOnClickListener {
                 interaction.onDeviceStateChanged(
-                    "${currentItem.topic}/state",
+                    "${item.topic}/state",
                     if (itemView.switch_alarm_activate.isChecked) "on" else "off"
                 )
             }
