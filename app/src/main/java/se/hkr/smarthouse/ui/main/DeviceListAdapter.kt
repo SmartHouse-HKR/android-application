@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.device_list_item_alarm.view.*
 import kotlinx.android.synthetic.main.device_list_item_fan.view.*
 import kotlinx.android.synthetic.main.device_list_item_header.view.*
 import kotlinx.android.synthetic.main.device_list_item_heater.view.*
+import kotlinx.android.synthetic.main.device_list_item_oven.view.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.models.Device
 import se.hkr.smarthouse.models.getSimpleName
@@ -252,7 +253,13 @@ class DeviceListAdapter(
             Log.d(TAG, "Binding Oven viewHolder: $currentItem")
             itemView.deviceTopic.text = currentItem.topic
             itemView.deviceName.text = currentItem.getSimpleName()
-            //TODO rest
+            itemView.ovenStateSwitch.isChecked = currentItem.state
+            itemView.ovenStateSwitch.setOnClickListener {
+                interaction.onDeviceStateChanged(
+                    "${currentItem.topic}/state",
+                    if (itemView.ovenStateSwitch.isChecked) "on" else "off"
+                )
+            }
         }
     }
 
