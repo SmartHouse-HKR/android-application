@@ -54,6 +54,12 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
                     job.cancel(CancellationException(UNABLE_TO_RESOLVE_HOST))
                 }
             }
+        } else {
+            onErrorReturn(
+                errorMessage = "There is no internet connection",
+                shouldUseDialog = false,
+                shouldUseToast = true
+            )
         }
     }
 
