@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.device_list_item_heater.view.*
 import kotlinx.android.synthetic.main.device_list_item_light.view.*
 import kotlinx.android.synthetic.main.device_list_item_oven.view.*
 import kotlinx.android.synthetic.main.device_list_item_temperature.view.*
+import kotlinx.android.synthetic.main.device_list_item_trigger.view.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.models.Device
 import se.hkr.smarthouse.models.getSimpleName
@@ -65,6 +66,10 @@ class DeviceListAdapter(
                     is Device.Alarm -> {
                         newItem as Device.Alarm
                         newItem.active == oldItem.active && newItem.triggered == oldItem.triggered
+                    }
+                    is Device.Trigger -> {
+                        newItem as Device.Trigger
+                        newItem.triggered == oldItem.triggered
                     }
                 }
             } catch (e: Exception) {
@@ -139,6 +144,13 @@ class DeviceListAdapter(
                     ), interaction
                 )
             }
+            Device.Trigger.IDENTIFIER -> {
+                TriggerViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.device_list_item_trigger, parent, false
+                    )
+                )
+            }
             else -> {
                 UnknownDeviceViewHolder(
                     LayoutInflater.from(parent.context).inflate(
@@ -160,6 +172,7 @@ class DeviceListAdapter(
             is FanViewHolder -> holder.bind(device)
             is HeaterViewHolder -> holder.bind(device)
             is AlarmViewHolder -> holder.bind(device)
+            is TriggerViewHolder -> holder.bind(device)
             else -> throw IllegalArgumentException("Illegal bind view holder")
         }
     }
@@ -174,6 +187,7 @@ class DeviceListAdapter(
             is Device.Fan -> Device.Fan.IDENTIFIER
             is Device.Heater -> Device.Heater.IDENTIFIER
             is Device.Alarm -> Device.Alarm.IDENTIFIER
+            is Device.Trigger -> Device.Trigger.IDENTIFIER
         }
     }
 
@@ -349,6 +363,18 @@ class DeviceListAdapter(
                     if (itemView.switch_alarm_activate.isChecked) "on" else "off"
                 )
             }
+        }
+    }
+
+    inner class TriggerViewHolder
+    constructor(
+        itemView: View
+    ) : BaseViewHolder<Device>(itemView) {
+        override fun bind(item: Device) = with(item as Device.Trigger) {
+            Log.d(TAG, "Binding Trigger viewHolder: $item")
+            itemView.text_device_topic.text = item.topic
+            itemView.text_device_name.text = item.getSimpleName()
+            itemView.switch_trigger_trigger.isChecked = item.triggered ?: false
         }
     }
 
