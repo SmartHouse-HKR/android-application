@@ -79,6 +79,15 @@ sealed class Device(
             const val IDENTIFIER = 6
         }
     }
+
+    data class Trigger(
+        override var topic: String,
+        var triggered: Boolean? = null
+    ) : Device(topic) {
+        companion object {
+            const val IDENTIFIER = 7
+        }
+    }
 }
 
 fun Device.getSimpleName(): String {
@@ -130,6 +139,9 @@ fun deviceBuilder(topic: String, message: String): Device {
                 }
                 else -> Device.UnknownDevice(topic)
             }
+        }
+        topic.contains("trigger") -> {
+            Device.Trigger(topic = topic, triggered = (message == "true"))
         }
         else -> Device.UnknownDevice(topic)
     }
