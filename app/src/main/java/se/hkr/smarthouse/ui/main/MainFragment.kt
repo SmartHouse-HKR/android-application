@@ -2,14 +2,18 @@ package se.hkr.smarthouse.ui.main
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.RadioButton
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.layout_device_filter.view.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.ui.main.state.MainStateEvent
+import se.hkr.smarthouse.util.Filters
 import se.hkr.smarthouse.util.TopSpacingItemDecoration
 
 class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
@@ -24,8 +28,24 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
         subscribeObservers()
         initializeRecyclerView()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.filter_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_filter -> {
+                showFilterOptions()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun subscribeObservers() {
@@ -35,7 +55,7 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
                 devicesState.deviceList?.let { devicesList ->
                     Log.d(TAG, "MainFragment: updating device with: $devicesList")
                     recyclerAdapter.apply {
-                        submitList(devicesList)
+                        submitList(devicesList, devicesState.filter ?: Filters.any)
                     }
                 }
             }
@@ -49,6 +69,44 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
             layoutManager = LinearLayoutManager(this@MainFragment.context)
             adapter = recyclerAdapter
             addItemDecoration(topSpacingDecoration)
+        }
+    }
+
+    private fun showFilterOptions() {
+        activity?.let {
+            val dialog = MaterialDialog(it)
+                .noAutoDismiss()
+                .customView(R.layout.layout_device_filter)
+            val view = dialog.getCustomView()
+            when (viewModel.getFilter()) {
+                Filters.regexLights -> view.filter_group.check(R.id.filter_lights)
+                Filters.regexHeaters -> view.filter_group.check(R.id.filter_heaters)
+                Filters.regexFans -> view.filter_group.check(R.id.filter_fans)
+                Filters.regexAlarms -> view.filter_group.check(R.id.filter_alarms)
+                Filters.regexEtc -> view.filter_group.check(R.id.filter_etc)
+            }
+            view.positive_button.setOnClickListener {
+                val selectedFilter =
+                    view.findViewById<RadioButton>(view.filter_group.checkedRadioButtonId)
+                val filter = when (selectedFilter.text) {
+                    getString(R.string.filter_lights) -> Filters.regexLights
+                    getString(R.string.filter_heaters) -> Filters.regexHeaters
+                    getString(R.string.filter_fans) -> Filters.regexFans
+                    getString(R.string.filter_alarms) -> Filters.regexAlarms
+                    getString(R.string.filter_etc) -> Filters.regexEtc
+                    else -> Filters.any
+                }
+                viewModel.setDeviceFilter(filter)
+                dialog.dismiss()
+            }
+            view.negative_button.setOnClickListener {
+                dialog.dismiss()
+            }
+            view.clear_button.setOnClickListener {
+                viewModel.setDeviceFilter(Filters.any)
+                dialog.dismiss()
+            }
+            dialog.show()
         }
     }
 

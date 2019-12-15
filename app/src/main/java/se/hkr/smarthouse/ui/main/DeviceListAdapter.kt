@@ -20,6 +20,8 @@ import kotlinx.android.synthetic.main.device_list_item_trigger.view.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.models.Device
 import se.hkr.smarthouse.models.getSimpleName
+import se.hkr.smarthouse.util.Filters
+import se.hkr.smarthouse.util.isEtc
 
 class DeviceListAdapter(
     private val interaction: Interaction
@@ -88,7 +90,7 @@ class DeviceListAdapter(
             super.submitList(newList?.toList(), commitCallback)
         }
 
-        override fun submitList(newList: MutableList<Device>?) {
+        override fun submitList(newList: List<Device>?) {
             super.submitList(newList?.toList())
         }
     }
@@ -195,8 +197,12 @@ class DeviceListAdapter(
         return differ.currentList.size
     }
 
-    fun submitList(list: List<Device>) {
-        differ.submitList(list) { Log.d(TAG, "adapter device submission done") }
+    fun submitList(list: List<Device>, filter: Regex = Filters.any) {
+        when (filter) {
+            Filters.any -> differ.submitList(list)
+            Filters.regexEtc -> differ.submitList(list.filter { it.topic.isEtc() })
+            else -> differ.submitList(list.filter { it.topic.matches(filter) })
+        }
     }
 
     inner class UnknownDeviceViewHolder
