@@ -19,6 +19,11 @@
     <string name="host_url">Host Url</string>
     <string name="topic">Topic</string>
     <string name="subscribe">Subscribe</string>
+    <string name="filter_lights">Lights</string>
+    <string name="filter_heaters">Heaters</string>
+    <string name="filter_fans">Fans</string>
+    <string name="filter_alarms">Alarms</string>
+    <string name="filter_etc">Etc</string>
 
     <string-array name="fan_speed_array">
         <item>0%</item>

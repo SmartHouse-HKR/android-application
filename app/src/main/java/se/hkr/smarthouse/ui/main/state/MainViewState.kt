@@ -11,7 +11,8 @@ data class MainViewState(
 )
 
 data class DeviceFields(
-    var deviceList: MutableList<Device>? = null
+    var deviceList: MutableList<Device>? = null,
+    var filter: Regex? = null
 ) {
     fun mergeLists(newDeviceList: MutableList<Device>) {
         newDeviceList.forEach { addDevice(it) }

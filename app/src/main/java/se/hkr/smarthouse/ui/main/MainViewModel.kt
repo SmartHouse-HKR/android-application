@@ -13,6 +13,7 @@ import se.hkr.smarthouse.ui.DataState
 import se.hkr.smarthouse.ui.main.state.*
 import se.hkr.smarthouse.util.AbsentLiveData
 import se.hkr.smarthouse.util.Constants
+import se.hkr.smarthouse.util.Filters
 import javax.inject.Inject
 
 class MainViewModel
@@ -94,6 +95,20 @@ constructor(
         val newDevices = deviceFields.deviceList!!
         newViewState.deviceFields?.mergeLists(newDevices)
         setViewState(newViewState)
+    }
+
+    fun getFilter(): Regex {
+        return getCurrentViewStateOrNew().deviceFields?.filter ?: Filters.any
+    }
+
+    fun setDeviceFilter(filter: Regex) {
+        val newViewState = getCurrentViewStateOrNew()
+        if (newViewState.deviceFields?.filter == filter) {
+            return
+        }
+        newViewState.deviceFields?.filter = filter
+        setViewState(newViewState)
+
     }
 
     fun cancelActiveJobs() {
