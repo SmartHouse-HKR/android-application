@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_devices"
+        android:icon="@drawable/ic_devices_black_24dp"
+        android:title="Populate devices"
+        app:showAsAction="ifRoom" />
+
+</menu>
