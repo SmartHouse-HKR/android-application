@@ -7,7 +7,7 @@ import se.hkr.smarthouse.util.Filters.regexLights
 
 //TODO turn into sealed class to take advantage of exhaustive when statements?
 object Filters {
-    val regexLights = Regex("[\\w\\W]*(light)[\\w\\W]*")
+    val regexLights = Regex("[\\w\\W]*(light|lamp)[\\w\\W]*")
     val regexHeaters = Regex("[\\w\\W]*(heater)[\\w\\W]*")
     val regexFans = Regex("[\\w\\W]*(fan)[\\w\\W]*")
     val regexAlarms = Regex("[\\w\\W]*(alarm|leak)[\\w\\W]*")
