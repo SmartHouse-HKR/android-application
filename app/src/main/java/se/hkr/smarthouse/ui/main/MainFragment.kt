@@ -151,6 +151,8 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
                     MqttConnection.publish("smarthouse/bt_fan/state", "yes")
                     MqttConnection.publish("smarthouse/bt_fan/swing", "false")
                     MqttConnection.publish("smarthouse/bt_fan/speed", "higher")
+                    MqttConnection.publish("smarthouse/bt_light/state", "on")
+                    MqttConnection.publish("smarthouse/bt_lamp/state", "on")
                 }
                 negativeButton(text = "CANCEL")
             }
