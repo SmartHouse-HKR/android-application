@@ -10,12 +10,13 @@
         android:layout_height="wrap_content"
         android:text="Filter options"
         android:textAlignment="center"
-        android:textColor="#000"
+        android:textColor="@color/colorPrimary"
         android:textSize="22sp" />
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
 
         <RadioGroup
             android:id="@+id/filter_group"
@@ -86,7 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="30dp"
             android:text="Clear"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/grey4"
             android:textSize="16sp" />
 
         <TextView
@@ -95,7 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="30dp"
             android:text="Cancel"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/grey5"
             android:textSize="16sp" />
 
         <TextView
@@ -103,7 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Apply"
-            android:textColor="@color/tealDark"
+            android:textColor="@color/colorPrimary"
             android:textSize="16sp" />
 
     </LinearLayout>

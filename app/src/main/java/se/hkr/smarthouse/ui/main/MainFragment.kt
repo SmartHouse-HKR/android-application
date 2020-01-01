@@ -145,6 +145,12 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
                     MqttConnection.publish("smarthouse/oven/state", "off")
                     MqttConnection.publish("smarthouse/window_alarm/state", "on")
                     MqttConnection.publish("smarthouse/window_alarm/trigger", "false")
+                    MqttConnection.publish("smarthouse/microwave/manual_start", "x0500t0010")
+                    MqttConnection.publish("smarthouse/microwave/preset_start", "fish")
+                    MqttConnection.publish("smarthouse/microwave/error", "no error")
+                    MqttConnection.publish("smarthouse/bt_fan/state", "yes")
+                    MqttConnection.publish("smarthouse/bt_fan/swing", "false")
+                    MqttConnection.publish("smarthouse/bt_fan/speed", "higher")
                 }
                 negativeButton(text = "CANCEL")
             }

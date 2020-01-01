@@ -88,6 +88,35 @@ sealed class Device(
             const val IDENTIFIER = 7
         }
     }
+
+    data class Microwave(
+        override var topic: String,
+        var manualStart: String? = null,
+        var presetStart: MicrowavePreset? = null,
+        var error: Boolean? = null
+    ) : Device(topic) {
+        companion object {
+            const val IDENTIFIER = 8
+        }
+
+        enum class MicrowavePreset {
+            DEFROST,
+            CHICKEN,
+            FISH,
+            POULTRY
+        }
+    }
+
+    data class BluetoothFan(
+        override var topic: String,
+        var state: Boolean? = null,
+        var swing: Boolean? = null,
+        var speed: Boolean? = null
+    ) : Device(topic) {
+        companion object {
+            const val IDENTIFIER = 9
+        }
+    }
 }
 
 fun Device.getSimpleName(): String {
@@ -100,7 +129,7 @@ fun deviceBuilder(topic: String, message: String): Device {
         return Device.UnknownDevice(topic, message)
     }
     val newDevice = when {
-        topic.contains("light") -> {
+        topic.contains("light") || topic.contains("lamp") -> {
             when {
                 topic.contains("outdoor") -> {
                     when {
@@ -116,10 +145,29 @@ fun deviceBuilder(topic: String, message: String): Device {
                 else -> Device.Light(topic, (message == "on"))
             }
         }
+        topic.contains("lamp") -> Device.Light(topic, (message == "on"))
         topic.contains("temperature") -> Device.Temperature(topic, message)
         topic.contains("voltage") -> Device.Voltage(topic, message)
         topic.contains("oven") -> Device.Oven(topic, (message == "on"))
-        topic.contains("fan") -> Device.Fan(topic, message)
+        topic.contains("fan") -> {
+            when {
+                topic.contains("bt_") -> {
+                    when {
+                        topic.contains("state") -> {
+                            Device.BluetoothFan(topic = topic, state = (message == "on"))
+                        }
+                        topic.contains("swing") -> {
+                            Device.BluetoothFan(topic = topic, swing = (message == "true"))
+                        }
+                        topic.contains("speed") -> {
+                            Device.BluetoothFan(topic = topic, speed = (message == "higher"))
+                        }
+                        else -> Device.UnknownDevice(topic, message)
+                    }
+                }
+                else -> Device.Fan(topic, message)
+            }
+        }
         topic.contains("heater") -> {
             when {
                 topic.contains("state") -> {
@@ -142,6 +190,35 @@ fun deviceBuilder(topic: String, message: String): Device {
         }
         topic.contains("trigger") -> {
             Device.Trigger(topic = topic, triggered = (message == "true"))
+        }
+        topic.contains("microwave") -> {
+            when {
+                topic.contains("manual_start") -> {
+                    Device.Microwave(
+                        topic = topic,
+                        manualStart = message
+                    )
+                }
+                topic.contains("preset_start") -> {
+                    Device.Microwave(
+                        topic = topic,
+                        presetStart = when (message) {
+                            "defrost" -> Device.Microwave.MicrowavePreset.DEFROST
+                            "chicken" -> Device.Microwave.MicrowavePreset.CHICKEN
+                            "fish" -> Device.Microwave.MicrowavePreset.FISH
+                            "poultry" -> Device.Microwave.MicrowavePreset.POULTRY
+                            else -> null
+                        }
+                    )
+                }
+                topic.contains("error") -> {
+                    Device.Microwave(
+                        topic = topic,
+                        error = (message != "no error")
+                    )
+                }
+                else -> Device.UnknownDevice(topic)
+            }
         }
         else -> Device.UnknownDevice(topic)
     }

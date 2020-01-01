@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="fan_speed_array">
+        <item>0%</item>
+        <item>50%</item>
+        <item>75%</item>
+        <item>100%</item>
+    </string-array>
+
+    <string-array name="microwave_watt_array">
+        <item>500w</item>
+        <item>600w</item>
+        <item>750w</item>
+        <item>800w</item>
+    </string-array>
+
+    <string-array name="microwave_preset_array">
+        <item>defrost</item>
+        <item>chicken</item>
+        <item>fish</item>
+        <item>poultry</item>
+    </string-array>
+
+</resources>

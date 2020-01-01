@@ -118,7 +118,7 @@ dependencies {
     implementation "com.google.android.material:material:$material_version"
 
     // Material dialogs
-    def material_dialogs_version = "3.1.0"
+    def material_dialogs_version = "3.1.1"
     implementation "com.afollestad.material-dialogs:core:$material_dialogs_version"
 
     // Card view

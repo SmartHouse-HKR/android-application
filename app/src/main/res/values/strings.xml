@@ -25,10 +25,4 @@
     <string name="filter_alarms">Alarms</string>
     <string name="filter_etc">Etc</string>
 
-    <string-array name="fan_speed_array">
-        <item>0%</item>
-        <item>50%</item>
-        <item>75%</item>
-        <item>100%</item>
-    </string-array>
 </resources>

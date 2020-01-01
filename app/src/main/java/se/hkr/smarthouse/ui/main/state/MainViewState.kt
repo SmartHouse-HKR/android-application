@@ -47,6 +47,20 @@ data class DeviceFields(
                 if (newDevice.triggered == null) newDevice.triggered = oldDevice.triggered
                 newDevice
             }
+            is Device.Microwave -> {
+                oldDevice as Device.Microwave
+                if (newDevice.manualStart == null) newDevice.manualStart = oldDevice.manualStart
+                if (newDevice.presetStart == null) newDevice.presetStart = oldDevice.presetStart
+                if (newDevice.error == null) newDevice.error = oldDevice.error
+                newDevice
+            }
+            is Device.BluetoothFan -> {
+                oldDevice as Device.BluetoothFan
+                if (newDevice.state == null) newDevice.state = oldDevice.state
+                if (newDevice.swing == null) newDevice.swing = oldDevice.swing
+                if (newDevice.speed == null) newDevice.speed = oldDevice.speed
+                newDevice
+            }
             else -> newDevice
         }
     }
