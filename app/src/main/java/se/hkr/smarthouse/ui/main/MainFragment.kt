@@ -89,6 +89,7 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
                 Filters.regexHeaters -> view.filter_group.check(R.id.filter_heaters)
                 Filters.regexFans -> view.filter_group.check(R.id.filter_fans)
                 Filters.regexAlarms -> view.filter_group.check(R.id.filter_alarms)
+                Filters.regexBluetooth -> view.filter_group.check(R.id.filter_bluetooth)
                 Filters.regexEtc -> view.filter_group.check(R.id.filter_etc)
             }
             view.positive_button.setOnClickListener {
@@ -99,6 +100,7 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
                     getString(R.string.filter_heaters) -> Filters.regexHeaters
                     getString(R.string.filter_fans) -> Filters.regexFans
                     getString(R.string.filter_alarms) -> Filters.regexAlarms
+                    getString(R.string.filter_bluetooth) -> Filters.regexBluetooth
                     getString(R.string.filter_etc) -> Filters.regexEtc
                     else -> Filters.any
                 }

@@ -23,6 +23,7 @@
     <string name="filter_heaters">Heaters</string>
     <string name="filter_fans">Fans</string>
     <string name="filter_alarms">Alarms</string>
+    <string name="filter_bluetooth">Bluetooth Devices</string>
     <string name="filter_etc">Etc</string>
 
 </resources>
