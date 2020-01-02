@@ -1,111 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Filter options"
-        android:textAlignment="center"
-        android:textColor="#000"
-        android:textSize="22sp" />
+    android:layout_margin="10dp">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <RadioGroup
             android:id="@+id/filter_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:orientation="vertical">
 
             <RadioButton
                 android:id="@+id/filter_lights"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/filter_lights"
-                android:textColor="#000"
-                android:textSize="16sp" />
+                style="@style/MyRadioButton"
+                android:layout_marginTop="0dp"
+                android:text="@string/filter_lights" />
 
             <RadioButton
                 android:id="@+id/filter_heaters"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/filter_heaters"
-                android:textColor="#000"
-                android:textSize="16sp" />
+                style="@style/MyRadioButton"
+                android:text="@string/filter_heaters" />
 
             <RadioButton
                 android:id="@+id/filter_fans"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/filter_fans"
-                android:textColor="#000"
-                android:textSize="16sp" />
+                style="@style/MyRadioButton"
+                android:text="@string/filter_fans" />
 
             <RadioButton
                 android:id="@+id/filter_alarms"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/filter_alarms"
-                android:textColor="#000"
-                android:textSize="16sp" />
+                style="@style/MyRadioButton"
+                android:text="@string/filter_alarms" />
+
+            <RadioButton
+                android:id="@+id/filter_bluetooth"
+                style="@style/MyRadioButton"
+                android:text="@string/filter_bluetooth" />
 
             <RadioButton
                 android:id="@+id/filter_etc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/filter_etc"
-                android:textColor="#000"
-                android:textSize="16sp" />
+                style="@style/MyRadioButton"
+                android:text="@string/filter_etc" />
 
         </RadioGroup>
 
     </ScrollView>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/clear_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="30dp"
-            android:text="Clear"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/negative_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="30dp"
-            android:text="Cancel"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/positive_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Apply"
-            android:textColor="@color/tealDark"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

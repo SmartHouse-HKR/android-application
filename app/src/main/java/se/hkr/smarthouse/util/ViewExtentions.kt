@@ -8,12 +8,14 @@ import androidx.annotation.StringRes
 import com.afollestad.materialdialogs.MaterialDialog
 import se.hkr.smarthouse.R
 
-fun Context.displayToast(@StringRes message: Int) {
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+fun Context.displayToast(@StringRes message: Int, long: Boolean = false) {
+    Toast.makeText(this, message, if (!long) Toast.LENGTH_SHORT else Toast.LENGTH_LONG)
+        .show()
 }
 
-fun Context.displayToast(message: String) {
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+fun Context.displayToast(message: String, long: Boolean = false) {
+    Toast.makeText(this, message, if (!long) Toast.LENGTH_SHORT else Toast.LENGTH_LONG)
+        .show()
 }
 
 fun Context.displaySuccessDialog(message: String) {

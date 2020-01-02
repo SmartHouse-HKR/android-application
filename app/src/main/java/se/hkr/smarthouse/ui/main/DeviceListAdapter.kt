@@ -9,14 +9,20 @@ import android.widget.AdapterView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import kotlinx.android.synthetic.main.device_list_item_alarm.view.*
+import kotlinx.android.synthetic.main.device_list_item_bluetooth_fan.view.*
 import kotlinx.android.synthetic.main.device_list_item_fan.view.*
 import kotlinx.android.synthetic.main.device_list_item_header.view.*
 import kotlinx.android.synthetic.main.device_list_item_heater.view.*
 import kotlinx.android.synthetic.main.device_list_item_light.view.*
+import kotlinx.android.synthetic.main.device_list_item_microwave.view.*
 import kotlinx.android.synthetic.main.device_list_item_oven.view.*
 import kotlinx.android.synthetic.main.device_list_item_temperature.view.*
 import kotlinx.android.synthetic.main.device_list_item_trigger.view.*
+import kotlinx.android.synthetic.main.layout_time_picker.view.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.models.Device
 import se.hkr.smarthouse.models.getSimpleName
@@ -72,6 +78,18 @@ class DeviceListAdapter(
                     is Device.Trigger -> {
                         newItem as Device.Trigger
                         newItem.triggered == oldItem.triggered
+                    }
+                    is Device.Microwave -> {
+                        newItem as Device.Microwave
+                        newItem.error == oldItem.error
+                                && newItem.manualStart == oldItem.manualStart
+                                && newItem.presetStart == oldItem.presetStart
+                    }
+                    is Device.BluetoothFan -> {
+                        newItem as Device.BluetoothFan
+                        newItem.speed == oldItem.speed
+                                && newItem.state == oldItem.state
+                                && newItem.swing == oldItem.swing
                     }
                 }
             } catch (e: Exception) {
@@ -153,6 +171,20 @@ class DeviceListAdapter(
                     )
                 )
             }
+            Device.Microwave.IDENTIFIER -> {
+                MicrowaveViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.device_list_item_microwave, parent, false
+                    ), interaction
+                )
+            }
+            Device.BluetoothFan.IDENTIFIER -> {
+                BluetoothFanViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.device_list_item_bluetooth_fan, parent, false
+                    ), interaction
+                )
+            }
             else -> {
                 UnknownDeviceViewHolder(
                     LayoutInflater.from(parent.context).inflate(
@@ -175,6 +207,8 @@ class DeviceListAdapter(
             is HeaterViewHolder -> holder.bind(device)
             is AlarmViewHolder -> holder.bind(device)
             is TriggerViewHolder -> holder.bind(device)
+            is MicrowaveViewHolder -> holder.bind(device)
+            is BluetoothFanViewHolder -> holder.bind(device)
             else -> throw IllegalArgumentException("Illegal bind view holder")
         }
     }
@@ -190,6 +224,8 @@ class DeviceListAdapter(
             is Device.Heater -> Device.Heater.IDENTIFIER
             is Device.Alarm -> Device.Alarm.IDENTIFIER
             is Device.Trigger -> Device.Trigger.IDENTIFIER
+            is Device.Microwave -> Device.Microwave.IDENTIFIER
+            is Device.BluetoothFan -> Device.BluetoothFan.IDENTIFIER
         }
     }
 
@@ -381,6 +417,122 @@ class DeviceListAdapter(
             itemView.text_device_topic.text = item.topic
             itemView.text_device_name.text = item.getSimpleName()
             itemView.switch_trigger_trigger.isChecked = item.triggered ?: false
+        }
+    }
+
+    inner class MicrowaveViewHolder
+    constructor(
+        itemView: View,
+        private val interaction: Interaction
+    ) : BaseViewHolder<Device>(itemView) {
+        override fun bind(item: Device) = with(item as Device.Microwave) {
+            Log.d(TAG, "Binding Microwave viewHolder: $item")
+            itemView.text_device_topic.text = item.topic
+            itemView.text_device_name.text = item.getSimpleName()
+            val itemsArray = itemView.context.resources.getStringArray(R.array.microwave_watt_array)
+            item.manualStart?.let {
+                val split = it.chunked(5)
+                val watt = split.component1()
+                val time = split.component2()
+                itemView.spinner_microwave_watt.setSelection(
+                    itemsArray.indexOfFirst { arrayItem ->
+                        arrayItem.removeSuffix("w") == watt.substring(2)
+                    }, false
+                )
+                itemView.text_microwave_time.text = formatTime(time.removePrefix("t"))
+            } ?: itemView.spinner_microwave_watt.setSelection(0, false)
+            itemView.text_microwave_time.setOnClickListener {
+                itemView.context?.let {
+                    val dialog = MaterialDialog(it)
+                        .noAutoDismiss()
+                        .customView(R.layout.layout_time_picker)
+                    val view = dialog.getCustomView()
+                    view.apply {
+                        picker_seconds.minValue = 0
+                        picker_seconds.maxValue = 59
+                        picker_minutes.minValue = 0
+                        picker_minutes.maxValue = 10
+                        picker_seconds.value =
+                            itemView.text_microwave_time.text.toString().takeLast(2).toInt()
+                        picker_minutes.value =
+                            itemView.text_microwave_time.text.toString().take(2).toInt()
+                        positive_button.setOnClickListener {
+                            val secondsPicked = picker_seconds.value
+                            val minutesPicked = picker_minutes.value
+                            itemView.text_microwave_time.text =
+                                formatTime(
+                                    String.format("%02d", minutesPicked) +
+                                            String.format("%02d", secondsPicked)
+                                )
+                            dialog.dismiss()
+                        }
+                        negative_button.setOnClickListener {
+                            dialog.dismiss()
+                        }
+                        clear_button.setOnClickListener {
+                            itemView.text_microwave_time.text = formatTime("0000")
+                            dialog.dismiss()
+                        }
+                    }
+                    dialog.show()
+                }
+            }
+            itemView.button_microwave_manual.setOnClickListener {
+                interaction.onDeviceStateChanged(
+                    "${item.topic}/manual_start",
+                    "w0"
+                            + itemsArray[itemView.spinner_microwave_watt.selectedItemPosition]
+                        .removeSuffix("w")
+                            + "t"
+                            + itemView.text_microwave_time.text.toString().removeRange(2, 3)
+                )
+            }
+            itemView.button_microwave_preset.setOnClickListener {
+                interaction.onDeviceStateChanged(
+                    "${item.topic}/preset_start",
+                    itemView.spinner_microwave_preset.selectedItem.toString()
+                )
+            }
+        }
+
+        private fun formatTime(string: String): String {
+            val minutes = string.substring(0, 2)
+            val seconds = string.substring(2, 4)
+            return "$minutes:$seconds"
+        }
+
+    }
+
+    inner class BluetoothFanViewHolder
+    constructor(
+        itemView: View,
+        private val interaction: Interaction
+    ) : BaseViewHolder<Device>(itemView) {
+        override fun bind(item: Device) = with(item as Device.BluetoothFan) {
+            Log.d(TAG, "Binding BluetoothFan viewHolder: $item")
+            itemView.text_device_topic.text = item.topic
+            itemView.text_device_name.text = item.getSimpleName()
+            itemView.switch_bluetooth_fan_state.isChecked = item.state ?: false
+            itemView.switch_bluetooth_fan_swing.isChecked = item.swing ?: false
+            itemView.switch_bluetooth_fan_speed.isChecked = item.speed ?: false
+            itemView.switch_bluetooth_fan_state.setOnClickListener {
+                interaction.onDeviceStateChanged(
+                    "${item.topic}/state",
+                    if (itemView.switch_bluetooth_fan_state.isChecked) "on" else "off"
+                )
+            }
+            itemView.switch_bluetooth_fan_swing.setOnClickListener {
+                interaction.onDeviceStateChanged(
+                    "${item.topic}/swing",
+                    if (itemView.switch_bluetooth_fan_swing.isChecked) "true" else "false"
+                )
+            }
+            itemView.switch_bluetooth_fan_speed.setOnClickListener {
+                interaction.onDeviceStateChanged(
+                    "${item.topic}/speed",
+                    if (itemView.switch_bluetooth_fan_speed.isChecked) "higher" else "lower"
+                )
+            }
         }
     }
 
