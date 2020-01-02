@@ -26,4 +26,9 @@
     <string name="filter_bluetooth">Bluetooth Devices</string>
     <string name="filter_etc">Etc</string>
 
+    <string name="filter_options">Filter Options</string>
+    <string name="apply">Apply</string>
+    <string name="cancel">Cancel</string>
+    <string name="clear_filters">Clear Filters</string>
+
 </resources>

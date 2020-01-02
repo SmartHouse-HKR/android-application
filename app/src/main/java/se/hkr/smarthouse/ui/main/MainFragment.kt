@@ -16,6 +16,7 @@ import se.hkr.smarthouse.mqtt.MqttConnection
 import se.hkr.smarthouse.ui.main.state.MainStateEvent
 import se.hkr.smarthouse.util.Filters
 import se.hkr.smarthouse.util.TopSpacingItemDecoration
+import se.hkr.smarthouse.util.displayToast
 
 class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
     private lateinit var recyclerAdapter: DeviceListAdapter
@@ -82,39 +83,46 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
         activity?.let {
             val dialog = MaterialDialog(it)
                 .noAutoDismiss()
-                .customView(R.layout.layout_device_filter)
-            val view = dialog.getCustomView()
-            when (viewModel.getFilter()) {
-                Filters.regexLights -> view.filter_group.check(R.id.filter_lights)
-                Filters.regexHeaters -> view.filter_group.check(R.id.filter_heaters)
-                Filters.regexFans -> view.filter_group.check(R.id.filter_fans)
-                Filters.regexAlarms -> view.filter_group.check(R.id.filter_alarms)
-                Filters.regexBluetooth -> view.filter_group.check(R.id.filter_bluetooth)
-                Filters.regexEtc -> view.filter_group.check(R.id.filter_etc)
-            }
-            view.positive_button.setOnClickListener {
-                val selectedFilter =
-                    view.findViewById<RadioButton>(view.filter_group.checkedRadioButtonId)
-                val filter = when (selectedFilter.text) {
-                    getString(R.string.filter_lights) -> Filters.regexLights
-                    getString(R.string.filter_heaters) -> Filters.regexHeaters
-                    getString(R.string.filter_fans) -> Filters.regexFans
-                    getString(R.string.filter_alarms) -> Filters.regexAlarms
-                    getString(R.string.filter_bluetooth) -> Filters.regexBluetooth
-                    getString(R.string.filter_etc) -> Filters.regexEtc
-                    else -> Filters.any
+                .customView(viewRes = R.layout.layout_device_filter)
+            dialog.getCustomView().apply {
+                when (viewModel.getFilter()) {
+                    Filters.regexLights -> filter_group.check(R.id.filter_lights)
+                    Filters.regexHeaters -> filter_group.check(R.id.filter_heaters)
+                    Filters.regexFans -> filter_group.check(R.id.filter_fans)
+                    Filters.regexAlarms -> filter_group.check(R.id.filter_alarms)
+                    Filters.regexBluetooth -> filter_group.check(R.id.filter_bluetooth)
+                    Filters.regexEtc -> filter_group.check(R.id.filter_etc)
                 }
-                viewModel.setDeviceFilter(filter)
-                dialog.dismiss()
             }
-            view.negative_button.setOnClickListener {
-                dialog.dismiss()
+            dialog.show {
+                title(R.string.filter_options)
+                negativeButton(R.string.cancel) { dismiss() }
+                neutralButton(R.string.clear_filters) {
+                    viewModel.setDeviceFilter(Filters.any)
+                    dismiss()
+                }
+                positiveButton(R.string.apply) {
+                    val selectedFilter =
+                        view.findViewById<RadioButton>(view.filter_group.checkedRadioButtonId)
+                    if (selectedFilter == null) {
+                        context.displayToast(
+                            "You must chose a filter, clear filters or cancel!", true
+                        )
+                    } else {
+                        val filter = when (selectedFilter.text) {
+                            getString(R.string.filter_lights) -> Filters.regexLights
+                            getString(R.string.filter_heaters) -> Filters.regexHeaters
+                            getString(R.string.filter_fans) -> Filters.regexFans
+                            getString(R.string.filter_alarms) -> Filters.regexAlarms
+                            getString(R.string.filter_bluetooth) -> Filters.regexBluetooth
+                            getString(R.string.filter_etc) -> Filters.regexEtc
+                            else -> Filters.any
+                        }
+                        viewModel.setDeviceFilter(filter)
+                        dismiss()
+                    }
+                }
             }
-            view.clear_button.setOnClickListener {
-                viewModel.setDeviceFilter(Filters.any)
-                dialog.dismiss()
-            }
-            dialog.show()
         }
     }
 
