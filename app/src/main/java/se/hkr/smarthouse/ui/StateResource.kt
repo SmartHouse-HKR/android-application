@@ -42,7 +42,7 @@ open class Event<out T>(private val content: T) {
     }
 
     companion object {
-        private val TAG: String = "AppDebug"
+        private const val TAG: String = "AppDebug"
 
         // We don't want an event if the data is null.
         fun <T> dataEvent(data: T?): Event<T>? {

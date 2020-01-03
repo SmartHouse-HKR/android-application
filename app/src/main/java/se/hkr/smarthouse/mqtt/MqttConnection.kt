@@ -12,7 +12,7 @@ import se.hkr.smarthouse.util.Constants
 import java.util.*
 
 object MqttConnection {
-    val TAG: String = "AppDebug"
+    const val TAG: String = "AppDebug"
     lateinit var mqttClient: MqttClient
 
     fun publish(

@@ -1,9 +1,13 @@
 <component name="ProjectDictionaryState">
   <dictionary name="STGA0006">
     <words>
+      <w>cardview</w>
       <w>coroutine</w>
       <w>coroutines</w>
+      <w>jetpack</w>
       <w>mqtt</w>
+      <w>mqttdashboard</w>
+      <w>recyclerview</w>
       <w>smarthome</w>
       <w>smarthouse</w>
       <w>viewmodel</w>
