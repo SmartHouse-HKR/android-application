@@ -5,7 +5,7 @@
     <item
         android:id="@+id/menu_devices"
         android:icon="@drawable/ic_devices_accent_24dp"
-        android:title="Populate devices"
+        android:title="@string/populate_devices"
         app:showAsAction="ifRoom" />
 
 </menu>

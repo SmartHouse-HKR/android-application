@@ -8,29 +8,37 @@
     <string name="password">Password</string>
     <string name="confirm_password">Confirm password</string>
     <string name="forgot_password">Forgot password</string>
-
-    <string name="create">Create</string>
-    <string name="account">Account</string>
-    <string name="home">Home</string>
-
     <string name="text_success">Success</string>
     <string name="text_ok">OK</string>
     <string name="text_error">Error</string>
     <string name="host_url">Host Url</string>
-    <string name="topic">Topic</string>
-    <string name="subscribe">Subscribe</string>
     <string name="filter_lights">Lights</string>
     <string name="filter_heaters">Heaters</string>
     <string name="filter_fans">Fans</string>
     <string name="filter_alarms">Alarms</string>
     <string name="filter_bluetooth">Bluetooth Devices</string>
     <string name="filter_etc">Etc</string>
-
     <string name="filter_options">Filter Options</string>
     <string name="apply">Apply</string>
     <string name="cancel">Cancel</string>
     <string name="clear_time">Clear Time</string>
     <string name="clear_filters">Clear Filters</string>
     <string name="time_picker">Time Picker</string>
+    <string name="android_logo">Android Logo</string>
+    <string name="power">power</string>
+    <string name="swing">swing</string>
+    <string name="activated">activated</string>
+    <string name="celsius">C°</string>
+    <string name="_18">18</string>
+    <string name="_00_00">00:00</string>
+    <string name="manual_start">Manual Start</string>
+    <string name="preset_start">Preset Start</string>
+    <string name="trigger">trigger</string>
+    <string name="name">Name</string>
+    <string name="todo">TODO</string>
+    <string name="populate_devices">Populate devices</string>
+    <string name="filter_devices">Filter devices</string>
+    <string name="broker_url">tcp://broker.mqttdashboard.com</string>
+    <string name="colon">:</string>
 
 </resources>
