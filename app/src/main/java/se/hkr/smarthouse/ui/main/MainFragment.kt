@@ -71,7 +71,8 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
 
     private fun initializeRecyclerView() {
         recyclerAdapter = DeviceListAdapter(this@MainFragment)
-        val topSpacingDecoration = TopSpacingItemDecoration(topPadding = 30)
+        val topSpacingDecoration =
+            TopSpacingItemDecoration(25, 25, 70, 70)
         mainFragmentRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainFragment.context)
             adapter = recyclerAdapter
@@ -130,7 +131,7 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
         // Just put all the devices on the broker, this should not be done by the phone anyway.
         activity?.let {
             MaterialDialog(it).show {
-                icon(R.drawable.ic_warning_black_24dp)
+                icon(R.drawable.ic_warning_accent_24dp)
                 title(text = "Populate all devices")
                 message(text = "This may take some seconds, the screen will freeze!")
                 positiveButton(text = "OK") {

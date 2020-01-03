@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/menu_devices"
-        android:icon="@drawable/ic_devices_black_24dp"
+        android:icon="@drawable/ic_devices_accent_24dp"
         android:title="Populate devices"
         app:showAsAction="ifRoom" />
 

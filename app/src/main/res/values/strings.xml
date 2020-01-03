@@ -29,6 +29,8 @@
     <string name="filter_options">Filter Options</string>
     <string name="apply">Apply</string>
     <string name="cancel">Cancel</string>
+    <string name="clear_time">Clear Time</string>
     <string name="clear_filters">Clear Filters</string>
+    <string name="time_picker">Time Picker</string>
 
 </resources>

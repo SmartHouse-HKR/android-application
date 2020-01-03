@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Main theme colors -->
-    <color name="colorPrimary">#871F78</color>
-    <color name="colorPrimaryDark">#471F78</color>
-    <color name="colorAccent">#B71F78</color>
-    <!--<color name="colorPrimaryDark">#7d7d7d</color>
-    <color name="colorAccent">#FF4081</color>-->
+    <color name="colorPrimary">#333333</color>
+    <color name="colorPrimaryDark">#1B1B1B</color>
+    <color name="colorPrimaryLight">#7B7C7E</color>
+    <color name="colorText">#FFFFFF</color>
+    <color name="colorAccent">#E77D1B</color>
 
     <!-- Secondary theme colors -->
+
+    <color name="colorAccentBlue">#05B1B3</color>
+    <color name="colorAccentYellow">#EFCA34</color>
+    <color name="colorAccentGreen">#81BF49</color>
+    <color name="colorAccentOrange">#E77D1B</color>
+
     <color name="tealDark">#0094DE</color>
     <color name="tealLight">#9FDAF7</color>
     <color name="link_blue">#0000EE</color>
