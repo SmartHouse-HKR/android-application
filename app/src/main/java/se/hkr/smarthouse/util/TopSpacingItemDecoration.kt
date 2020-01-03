@@ -21,6 +21,5 @@ class TopSpacingItemDecoration(
         outRect.bottom = bottomPadding
         outRect.left = leftPadding
         outRect.right = rightPadding
-
     }
 }

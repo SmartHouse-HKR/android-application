@@ -19,7 +19,6 @@
         <Spinner
             android:id="@+id/spinner_fan_speed"
             style="@style/MySpinner"
-            android:entries="@array/fan_speed_array"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

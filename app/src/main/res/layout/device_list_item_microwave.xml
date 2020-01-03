@@ -19,7 +19,6 @@
         <Spinner
             android:id="@+id/spinner_microwave_watt"
             style="@style/MySpinner"
-            android:entries="@array/microwave_watt_array"
             app:layout_constraintBottom_toTopOf="@id/text_microwave_time"
             app:layout_constraintEnd_toStartOf="@id/guideline_vertical_middle"
             app:layout_constraintStart_toStartOf="parent"
@@ -30,6 +29,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:background="@drawable/rounded_corner"
+            android:elevation="10dp"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="10dp"
             android:text="00:00"
             app:layout_constraintBottom_toTopOf="@id/guideline_buttons"
             app:layout_constraintEnd_toEndOf="@+id/guideline_vertical_middle"
@@ -46,7 +51,6 @@
         <Spinner
             android:id="@+id/spinner_microwave_preset"
             style="@style/MySpinner"
-            android:entries="@array/microwave_preset_array"
             app:layout_constraintBottom_toTopOf="@id/guideline_buttons"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/guideline_vertical_middle"

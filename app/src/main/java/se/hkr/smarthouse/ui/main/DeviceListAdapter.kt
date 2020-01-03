@@ -6,6 +6,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -335,6 +336,9 @@ class DeviceListAdapter(
             itemView.fan_text_device_name.text = item.getSimpleName()
             val itemsArray = itemView.context.resources.getStringArray(R.array.fan_speed_array)
             // This assumes that .speed will always be 0/50/75/100, otherwise just shows 0%
+            itemView.spinner_fan_speed.adapter = ArrayAdapter<String>(
+                itemView.context, R.layout.spinner_item, itemsArray
+            )
             itemView.spinner_fan_speed.setSelection(
                 itemsArray.indexOfFirst { arrayItem ->
                     arrayItem.removeSuffix("%") == item.speed
@@ -417,7 +421,6 @@ class DeviceListAdapter(
     ) : BaseViewHolder<Device>(itemView) {
         override fun bind(item: Device) = with(item as Device.Trigger) {
             Log.d(TAG, "Binding Trigger viewHolder: $item")
-
             itemView.trigger_text_device_name.text = item.getSimpleName()
             itemView.switch_trigger_trigger.isChecked = item.triggered ?: false
         }
@@ -431,13 +434,22 @@ class DeviceListAdapter(
         override fun bind(item: Device) = with(item as Device.Microwave) {
             Log.d(TAG, "Binding Microwave viewHolder: $item")
             itemView.microwave_text_device_name.text = item.getSimpleName()
-            val itemsArray = itemView.context.resources.getStringArray(R.array.microwave_watt_array)
+            val wattItemsArray =
+                itemView.context.resources.getStringArray(R.array.microwave_watt_array)
+            val presetItemsArray =
+                itemView.context.resources.getStringArray(R.array.microwave_preset_array)
+            itemView.spinner_microwave_watt.adapter = ArrayAdapter<String>(
+                itemView.context, R.layout.spinner_item, wattItemsArray
+            )
+            itemView.spinner_microwave_preset.adapter = ArrayAdapter<String>(
+                itemView.context, R.layout.spinner_item, presetItemsArray
+            )
             item.manualStart?.let {
                 val split = it.chunked(5)
                 val watt = split.component1()
                 val time = split.component2()
                 itemView.spinner_microwave_watt.setSelection(
-                    itemsArray.indexOfFirst { arrayItem ->
+                    wattItemsArray.indexOfFirst { arrayItem ->
                         arrayItem.removeSuffix("w") == watt.substring(2)
                     }, false
                 )
@@ -450,7 +462,7 @@ class DeviceListAdapter(
                 interaction.onDeviceStateChanged(
                     "${item.topic}/manual_start",
                     "w0"
-                            + itemsArray[itemView.spinner_microwave_watt.selectedItemPosition]
+                            + wattItemsArray[itemView.spinner_microwave_watt.selectedItemPosition]
                         .removeSuffix("w")
                             + "t"
                             + itemView.text_microwave_time.text.toString().removeRange(2, 3)
