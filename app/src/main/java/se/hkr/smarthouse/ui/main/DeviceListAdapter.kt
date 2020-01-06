@@ -15,6 +15,7 @@ import com.afollestad.materialdialogs.customview.getCustomView
 import com.triggertrap.seekarc.SeekArc
 import kotlinx.android.synthetic.main.device_list_item_alarm.view.*
 import kotlinx.android.synthetic.main.device_list_item_bluetooth_fan.view.*
+import kotlinx.android.synthetic.main.device_list_item_bluetooth_lamp.view.*
 import kotlinx.android.synthetic.main.device_list_item_fan.view.*
 import kotlinx.android.synthetic.main.device_list_item_heater.view.*
 import kotlinx.android.synthetic.main.device_list_item_light.view.*
@@ -30,6 +31,7 @@ import se.hkr.smarthouse.util.Filters
 import se.hkr.smarthouse.util.isEtc
 import kotlinx.android.synthetic.main.device_list_item_alarm.view.text_device_name as alarm_text_device_name
 import kotlinx.android.synthetic.main.device_list_item_bluetooth_fan.view.text_device_name as bluetooth_fan_text_device_name
+import kotlinx.android.synthetic.main.device_list_item_bluetooth_lamp.view.text_device_name as bluetooth_lamp_text_device_name
 import kotlinx.android.synthetic.main.device_list_item_fan.view.text_device_name as fan_text_device_name
 import kotlinx.android.synthetic.main.device_list_item_heater.view.text_device_name as heater_text_device_name
 import kotlinx.android.synthetic.main.device_list_item_light.view.text_device_name as light_text_device_name
@@ -101,6 +103,10 @@ class DeviceListAdapter(
                         newItem.speed == oldItem.speed
                                 && newItem.state == oldItem.state
                                 && newItem.swing == oldItem.swing
+                    }
+                    is Device.BluetoothLamp -> {
+                        newItem as Device.BluetoothLamp
+                        newItem.state == oldItem.state
                     }
                 }
             } catch (e: Exception) {
@@ -196,6 +202,13 @@ class DeviceListAdapter(
                     ), interaction
                 )
             }
+            Device.BluetoothLamp.IDENTIFIER -> {
+                BluetoothLampViewHolder(
+                    LayoutInflater.from(parent.context).inflate(
+                        R.layout.device_list_item_bluetooth_lamp, parent, false
+                    ), interaction
+                )
+            }
             else -> {
                 UnknownDeviceViewHolder(
                     LayoutInflater.from(parent.context).inflate(
@@ -220,6 +233,7 @@ class DeviceListAdapter(
             is TriggerViewHolder -> holder.bind(device)
             is MicrowaveViewHolder -> holder.bind(device)
             is BluetoothFanViewHolder -> holder.bind(device)
+            is BluetoothLampViewHolder -> holder.bind(device)
             else -> throw IllegalArgumentException("Illegal bind view holder")
         }
     }
@@ -237,6 +251,7 @@ class DeviceListAdapter(
             is Device.Trigger -> Device.Trigger.IDENTIFIER
             is Device.Microwave -> Device.Microwave.IDENTIFIER
             is Device.BluetoothFan -> Device.BluetoothFan.IDENTIFIER
+            is Device.BluetoothLamp -> Device.BluetoothLamp.IDENTIFIER
         }
     }
 
@@ -575,6 +590,45 @@ class DeviceListAdapter(
                     "${item.topic}/speed",
                     if (itemView.switch_bluetooth_fan_speed.isChecked) "higher" else "lower"
                 )
+            }
+        }
+    }
+
+    inner class BluetoothLampViewHolder
+    constructor(
+        itemView: View,
+        private val interaction: Interaction
+    ) : BaseViewHolder<Device>(itemView) {
+        override fun bind(item: Device) = with(item as Device.BluetoothLamp) {
+            Log.d(TAG, "Binding BluetoothLamp viewHolder: $item")
+            itemView.bluetooth_lamp_text_device_name.text = item.getSimpleName()
+            val state = item.state.toCharArray()
+            val lamps = listOf(
+                itemView.bluetooth_lamp_one,
+                itemView.bluetooth_lamp_two,
+                itemView.bluetooth_lamp_three,
+                itemView.bluetooth_lamp_four
+            )
+            for (index in lamps.indices) {
+                if (state[index] == '1') {
+                    lamps[index].background =
+                        itemView.context.getDrawable(R.drawable.ic_lamp_on_24dp)
+                } else {
+                    lamps[index].background =
+                        itemView.context.getDrawable(R.drawable.ic_lamp_off_24dp)
+                }
+            }
+            lamps.forEachIndexed { index, lamp ->
+                lamp.setOnClickListener {
+                    interaction.onDeviceStateChanged(
+                        "${item.topic}/state",
+                        StringBuilder(item.state).replace(
+                            index,
+                            index + 1,
+                            if (state[index] == '1') "0" else "1"
+                        ).toString()
+                    )
+                }
             }
         }
     }
