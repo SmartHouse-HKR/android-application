@@ -2,7 +2,6 @@ package se.hkr.smarthouse.ui.main
 
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -13,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.triggertrap.seekarc.SeekArc
 import kotlinx.android.synthetic.main.device_list_item_alarm.view.*
 import kotlinx.android.synthetic.main.device_list_item_bluetooth_fan.view.*
 import kotlinx.android.synthetic.main.device_list_item_fan.view.*
@@ -289,9 +289,6 @@ class DeviceListAdapter(
             Log.d(TAG, "Binding Temperature viewHolder: $item")
             itemView.temperature_text_device_name.text = item.getSimpleName()
             itemView.text_temperature_value.text = item.temperature
-            itemView.slider_temperature_value.value = item.temperature.toFloat()
-            // Make it not clickable by consuming the touch event and doing nothing with it
-            itemView.slider_temperature_value.setOnTouchListener { _, _ -> true }
         }
     }
 
@@ -372,26 +369,59 @@ class DeviceListAdapter(
         override fun bind(item: Device) = with(item as Device.Heater) {
             Log.d(TAG, "Binding Heater viewHolder: $item")
             itemView.heater_text_device_name.text = item.getSimpleName()
-            itemView.switch_heater_activate.isChecked = item.state ?: false
-            itemView.switch_heater_activate.setOnClickListener {
+            initializeSeekArc(item)
+            itemView.text_heater_value.text = item.value ?: "0"
+            item.state?.let {
+                itemView.constraint_layout_heater_value.background =
+                    if (it) {
+                        itemView.context.getDrawable(R.drawable.circle_green)
+                    } else {
+                        itemView.context.getDrawable(R.drawable.circle_red)
+                    }
+            }
+            itemView.constraint_layout_heater_value.setOnClickListener {
                 interaction.onDeviceStateChanged(
                     "${item.topic}/state",
-                    if (itemView.switch_heater_activate.isChecked) "on" else "off"
+                    if (item.state == null || item.state == false) {
+                        "on"
+                    } else {
+                        "off"
+                    }
                 )
             }
-            itemView.text_heater_value.text = item.value ?: "0"
-            itemView.slider_heater_value.value = item.value?.toFloat() ?: 0f
-            itemView.slider_heater_value.setOnChangeListener { _, value ->
-                itemView.text_heater_value.text = String.format("%.2f", value)
-            }
-            itemView.slider_heater_value.setOnTouchListener { _, event ->
-                if (event?.action == MotionEvent.ACTION_UP) {
-                    interaction.onDeviceStateChanged(
-                        "${item.topic}/value",
-                        itemView.text_heater_value.text.toString()
-                    )
+        }
+
+        private fun initializeSeekArc(item: Device.Heater) {
+            itemView.seek_arc.apply {
+                if (item.state == null || item.state == false) {
+                    arcColor = itemView.context.getColor(R.color.colorAccentRed)
+                    progressColor = itemView.context.getColor(R.color.colorAccentRed)
+                } else {
+                    arcColor = itemView.context.getColor(R.color.colorAccentGreen)
+                    progressColor = itemView.context.getColor(R.color.colorAccentGreen)
                 }
-                false
+                progress = try {
+                    item.value?.toFloat()?.toInt() ?: 0
+                } catch (e: Exception) {
+                    // When temp is a decimal, since seek arc library does not support it.
+                    0
+                }
+                setOnSeekArcChangeListener(object : SeekArc.OnSeekArcChangeListener {
+                    override fun onProgressChanged(p0: SeekArc?, p1: Int, p2: Boolean) {
+                        itemView.text_heater_value.text =
+                            String.format("%d", p1)
+                    }
+
+                    override fun onStartTrackingTouch(p0: SeekArc?) {
+                    }
+
+                    override fun onStopTrackingTouch(p0: SeekArc?) {
+                        interaction.onDeviceStateChanged(
+                            "${item.topic}/value",
+                            itemView.text_heater_value.text.toString()
+                        )
+                    }
+                })
             }
         }
     }

@@ -11,7 +11,10 @@
 
     <color name="colorAccentBlue">#05B1B3</color>
     <color name="colorAccentYellow">#EFCA34</color>
+    <color name="colorAccentLightGreen">#B1BF89</color>
     <color name="colorAccentGreen">#81BF49</color>
+    <color name="colorAccentLightRed">#DF4454</color>
+    <color name="colorAccentRed">#DF2404</color>
     <color name="colorAccentOrange">#E77D1B</color>
 
     <color name="tealDark">#0094DE</color>
