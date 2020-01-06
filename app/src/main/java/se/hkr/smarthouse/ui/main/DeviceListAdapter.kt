@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.device_list_item_microwave.view.*
 import kotlinx.android.synthetic.main.device_list_item_oven.view.*
 import kotlinx.android.synthetic.main.device_list_item_temperature.view.*
 import kotlinx.android.synthetic.main.device_list_item_trigger.view.*
+import kotlinx.android.synthetic.main.device_list_item_voltage.view.*
 import kotlinx.android.synthetic.main.layout_time_picker.view.*
 import se.hkr.smarthouse.R
 import se.hkr.smarthouse.models.Device
@@ -103,6 +104,7 @@ class DeviceListAdapter(
                         newItem.speed == oldItem.speed
                                 && newItem.state == oldItem.state
                                 && newItem.swing == oldItem.swing
+                                && newItem.mode == oldItem.mode
                     }
                     is Device.BluetoothLamp -> {
                         newItem as Device.BluetoothLamp
@@ -274,7 +276,7 @@ class DeviceListAdapter(
     ) : BaseViewHolder<Device>(itemView) {
         override fun bind(item: Device) = with(item as Device.UnknownDevice) {
             Log.d(TAG, "Binding UnknownDevice viewHolder: $item")
-            itemView.unknown_text_device_name.text = item.getSimpleName()
+            itemView.unknown_text_device_name.text = item.topic
         }
     }
 
@@ -314,9 +316,8 @@ class DeviceListAdapter(
     ) : BaseViewHolder<Device>(itemView) {
         override fun bind(item: Device) = with(item as Device.Voltage) {
             Log.d(TAG, "Binding Voltage viewHolder: $item")
-
             itemView.voltage_text_device_name.text = item.getSimpleName()
-            //TODO rest
+            itemView.text_voltage_state.text = "${item.voltage}V"
         }
     }
 
@@ -572,7 +573,12 @@ class DeviceListAdapter(
             itemView.bluetooth_fan_text_device_name.text = item.getSimpleName()
             itemView.switch_bluetooth_fan_state.isChecked = item.state ?: false
             itemView.switch_bluetooth_fan_swing.isChecked = item.swing ?: false
-            itemView.switch_bluetooth_fan_speed.isChecked = item.speed ?: false
+            itemView.switch_bluetooth_fan_mode.setOnClickListener {
+                interaction.onDeviceStateChanged(
+                    "${item.topic}/mode",
+                    "on"
+                )
+            }
             itemView.switch_bluetooth_fan_state.setOnClickListener {
                 interaction.onDeviceStateChanged(
                     "${item.topic}/state",
@@ -585,10 +591,16 @@ class DeviceListAdapter(
                     if (itemView.switch_bluetooth_fan_swing.isChecked) "true" else "false"
                 )
             }
-            itemView.switch_bluetooth_fan_speed.setOnClickListener {
+            itemView.speed_bluetooth_fan_plus.setOnClickListener {
                 interaction.onDeviceStateChanged(
                     "${item.topic}/speed",
-                    if (itemView.switch_bluetooth_fan_speed.isChecked) "higher" else "lower"
+                    "lower"
+                )
+            }
+            itemView.speed_bluetooth_fan_plus.setOnClickListener {
+                interaction.onDeviceStateChanged(
+                    "${item.topic}/speed",
+                    "higher"
                 )
             }
         }

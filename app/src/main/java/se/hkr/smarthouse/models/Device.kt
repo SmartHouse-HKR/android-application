@@ -111,7 +111,8 @@ sealed class Device(
         override var topic: String,
         var state: Boolean? = null,
         var swing: Boolean? = null,
-        var speed: Boolean? = null
+        var speed: Boolean? = null,
+        var mode: Boolean = true
     ) : Device(topic) {
         companion object {
             const val IDENTIFIER = 9
@@ -181,6 +182,9 @@ fun deviceBuilder(topic: String, message: String): Device {
                         }
                         topic.contains("speed") -> {
                             Device.BluetoothFan(topic = topic, speed = (message == "higher"))
+                        }
+                        topic.contains("mode") -> {
+                            Device.BluetoothFan(topic = topic, mode = true)
                         }
                         else -> Device.UnknownDevice(topic, message)
                     }

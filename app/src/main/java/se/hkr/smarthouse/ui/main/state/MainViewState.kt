@@ -59,6 +59,7 @@ data class DeviceFields(
                 if (newDevice.state == null) newDevice.state = oldDevice.state
                 if (newDevice.swing == null) newDevice.swing = oldDevice.swing
                 if (newDevice.speed == null) newDevice.speed = oldDevice.speed
+                newDevice.mode = oldDevice.mode
                 newDevice
             }
             else -> newDevice
