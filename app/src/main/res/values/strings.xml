@@ -40,5 +40,9 @@
     <string name="filter_devices">Filter devices</string>
     <string name="broker_url">tcp://broker.mqttdashboard.com</string>
     <string name="colon">:</string>
+    <string name="plus">+</string>
+    <string name="minus">-</string>
+    <string name="speed">speed</string>
+    <string name="change_mode">Change Mode</string>
 
 </resources>

@@ -20,28 +20,80 @@
             android:id="@+id/switch_bluetooth_fan_state"
             style="@style/MySwitch"
             android:text="@string/power"
-            app:layout_constraintBottom_toTopOf="@+id/switch_bluetooth_fan_swing"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/speed_bluetooth_fan_layout"
+            app:layout_constraintEnd_toStartOf="@id/switch_bluetooth_fan_mode"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_device_name" />
+
+        <Button
+            android:id="@+id/switch_bluetooth_fan_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corner"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:elevation="10dp"
+            android:text="@string/change_mode"
+            app:layout_constraintBottom_toTopOf="@id/speed_bluetooth_fan_layout"
+            app:layout_constraintEnd_toStartOf="@id/switch_bluetooth_fan_swing"
+            app:layout_constraintStart_toEndOf="@id/switch_bluetooth_fan_state"
             app:layout_constraintTop_toBottomOf="@+id/text_device_name" />
 
         <Switch
             android:id="@+id/switch_bluetooth_fan_swing"
             style="@style/MySwitch"
             android:text="@string/swing"
-            app:layout_constraintBottom_toTopOf="@+id/switch_bluetooth_fan_speed"
+            app:layout_constraintBottom_toTopOf="@+id/speed_bluetooth_fan_layout"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch_bluetooth_fan_state" />
+            app:layout_constraintStart_toEndOf="@id/switch_bluetooth_fan_mode"
+            app:layout_constraintTop_toBottomOf="@+id/text_device_name" />
 
-        <Switch
-            android:id="@+id/switch_bluetooth_fan_speed"
-            style="@style/MySwitch"
-            android:text="speed"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/speed_bluetooth_fan_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch_bluetooth_fan_swing" />
+            app:layout_constraintTop_toBottomOf="@+id/switch_bluetooth_fan_swing">
+
+            <TextView
+                android:id="@+id/speed_bluetooth_fan_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/speed"
+                android:textAlignment="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/speed_bluetooth_fan_layout" />
+
+            <Button
+                android:id="@+id/speed_bluetooth_fan_minus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/rounded_corner"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:elevation="10dp"
+                android:text="@string/minus"
+                app:layout_constraintEnd_toStartOf="@id/speed_bluetooth_fan_plus"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/speed_bluetooth_fan_text" />
+
+            <Button
+                android:id="@+id/speed_bluetooth_fan_plus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/rounded_corner"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:elevation="10dp"
+                android:text="@string/plus"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/speed_bluetooth_fan_minus"
+                app:layout_constraintTop_toBottomOf="@+id/speed_bluetooth_fan_text" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

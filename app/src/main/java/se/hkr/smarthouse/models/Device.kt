@@ -111,10 +111,20 @@ sealed class Device(
         override var topic: String,
         var state: Boolean? = null,
         var swing: Boolean? = null,
-        var speed: Boolean? = null
+        var speed: Boolean? = null,
+        var mode: Boolean = true
     ) : Device(topic) {
         companion object {
             const val IDENTIFIER = 9
+        }
+    }
+
+    data class BluetoothLamp(
+        override var topic: String,
+        var state: String = "0000"
+    ) : Device(topic) {
+        companion object {
+            const val IDENTIFIER = 10
         }
     }
 }
@@ -131,6 +141,17 @@ fun deviceBuilder(topic: String, message: String): Device {
     val newDevice = when {
         topic.contains("light") || topic.contains("lamp") -> {
             when {
+                topic.contains("bt_") -> {
+                    when {
+                        topic.contains("light") -> {
+                            Device.BluetoothLamp(
+                                topic = topic,
+                                state = message
+                            )
+                        }
+                        else -> Device.Light(topic, (message == "on"))
+                    }
+                }
                 topic.contains("outdoor") -> {
                     when {
                         topic.contains("state") -> {
@@ -161,6 +182,9 @@ fun deviceBuilder(topic: String, message: String): Device {
                         }
                         topic.contains("speed") -> {
                             Device.BluetoothFan(topic = topic, speed = (message == "higher"))
+                        }
+                        topic.contains("mode") -> {
+                            Device.BluetoothFan(topic = topic, mode = true)
                         }
                         else -> Device.UnknownDevice(topic, message)
                     }
