@@ -16,58 +16,85 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Switch
-            android:id="@+id/switch_heater_activate"
-            style="@style/MySwitch"
-            android:text="@string/activated"
-            app:layout_constraintBottom_toTopOf="@+id/constraint_layout_heater_value"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_device_name" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_vertical_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.75" />
+
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_vertical_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.25" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraint_layout_heater_value"
+            android:id="@+id/constraint_layout_heater"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="0dp"
+            android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch_heater_activate">
+            app:layout_constraintDimensionRatio="w,1:1"
+            app:layout_constraintEnd_toEndOf="@+id/guideline_vertical_right"
+            app:layout_constraintStart_toStartOf="@id/guideline_vertical_left"
+            app:layout_constraintTop_toBottomOf="@+id/text_device_name">
 
-            <TextView
-                android:id="@+id/text_heater_unit"
+            <com.triggertrap.seekarc.SeekArc
+                android:id="@+id/seek_arc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:text="@string/celsius"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slider_heater_value"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:stepSize="0"
-                android:value="18"
-                android:valueFrom="-20"
-                android:valueTo="40"
-                app:layout_constraintEnd_toStartOf="@+id/text_heater_value"
-                app:layout_constraintStart_toEndOf="@+id/text_heater_unit"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/text_heater_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:text="@string/_18"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:padding="15dp"
+                app:arcWidth="3dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:max="40"
+                app:rotation="180"
+                app:startAngle="80"
+                app:sweepAngle="200"
+                app:touchInside="true" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_layout_heater_value"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/circle_red"
+                android:clickable="true"
+                android:elevation="3dp"
+                android:focusable="true"
+                android:scaleX="0.6"
+                android:scaleY="0.6"
+                app:layout_constraintBottom_toBottomOf="@+id/seek_arc"
+                app:layout_constraintEnd_toEndOf="@+id/seek_arc"
+                app:layout_constraintStart_toStartOf="@+id/seek_arc"
+                app:layout_constraintTop_toTopOf="@+id/seek_arc">
+
+                <TextView
+                    android:id="@+id/text_heater_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/celsius"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toEndOf="@id/text_heater_value"
+                    app:layout_constraintTop_toTopOf="@id/text_heater_value" />
+
+                <TextView
+                    android:id="@+id/text_heater_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="25dp"
+                    android:text="@string/_18"
+                    android:textSize="45sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

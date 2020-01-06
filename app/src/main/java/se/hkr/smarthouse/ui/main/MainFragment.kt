@@ -72,7 +72,7 @@ class MainFragment : BaseMainFragment(), DeviceListAdapter.Interaction {
     private fun initializeRecyclerView() {
         recyclerAdapter = DeviceListAdapter(this@MainFragment)
         val topSpacingDecoration =
-            TopSpacingItemDecoration(25, 25, 70, 70)
+            TopSpacingItemDecoration(25, 0, 50, 50)
         mainFragmentRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainFragment.context)
             adapter = recyclerAdapter
