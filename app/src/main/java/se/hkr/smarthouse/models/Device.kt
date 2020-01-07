@@ -168,7 +168,12 @@ fun deviceBuilder(topic: String, message: String): Device {
         }
         topic.contains("lamp") -> Device.Light(topic, (message == "on"))
         topic.contains("temperature") -> Device.Temperature(topic, message)
-        topic.contains("voltage") -> Device.Voltage(topic, message)
+        topic.contains("voltage") -> {
+            when {
+                topic.contains("value") -> Device.Voltage(topic, message)
+                else -> Device.Voltage(topic)
+            }
+        }
         topic.contains("oven") -> Device.Oven(topic, (message == "on"))
         topic.contains("fan") -> {
             when {
