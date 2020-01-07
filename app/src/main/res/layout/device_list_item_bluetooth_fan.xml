@@ -27,7 +27,7 @@
 
         <Button
             android:id="@+id/switch_bluetooth_fan_mode"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_corner"
             android:backgroundTint="@color/colorPrimaryDark"
