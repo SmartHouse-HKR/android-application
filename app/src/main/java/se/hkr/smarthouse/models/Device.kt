@@ -136,7 +136,7 @@ fun Device.getSimpleName(): String {
 fun deviceBuilder(topic: String, message: String): Device {
     val splitTopic = topic.split("/")
     if (splitTopic.size != 3) { // Topic should ALWAYS 3 parts as described in the current protocol.
-        return Device.UnknownDevice(topic, message)
+        return Device.UnknownDevice("Unknown_$topic", message)
     }
     val newDevice = when {
         topic.contains("light") || topic.contains("lamp") -> {
@@ -160,7 +160,7 @@ fun deviceBuilder(topic: String, message: String): Device {
                         topic.contains("trigger") -> {
                             Device.Alarm(topic = topic, triggered = (message == "true"))
                         }
-                        else -> Device.UnknownDevice(topic, message)
+                        else -> Device.Alarm(topic = topic)
                     }
                 }
                 else -> Device.Light(topic, (message == "on"))
@@ -186,7 +186,10 @@ fun deviceBuilder(topic: String, message: String): Device {
                         topic.contains("mode") -> {
                             Device.BluetoothFan(topic = topic, mode = true)
                         }
-                        else -> Device.UnknownDevice(topic, message)
+                        topic.contains("timer") -> {
+                            Device.BluetoothFan(topic = topic, mode = true)
+                        }
+                        else -> Device.BluetoothFan(topic = topic, mode = true)
                     }
                 }
                 else -> Device.Fan(topic, message)
@@ -198,7 +201,7 @@ fun deviceBuilder(topic: String, message: String): Device {
                     Device.Heater(topic = topic, state = (message == "on"))
                 }
                 topic.contains("value") -> Device.Heater(topic = topic, value = message)
-                else -> Device.UnknownDevice(topic)
+                else -> Device.Heater(topic)
             }
         }
         topic.contains("alarm") -> {
@@ -209,7 +212,7 @@ fun deviceBuilder(topic: String, message: String): Device {
                 topic.contains("trigger") -> {
                     Device.Alarm(topic = topic, triggered = (message == "true"))
                 }
-                else -> Device.UnknownDevice(topic)
+                else -> Device.Alarm(topic)
             }
         }
         topic.contains("trigger") -> {
@@ -241,10 +244,10 @@ fun deviceBuilder(topic: String, message: String): Device {
                         error = (message != "no error")
                     )
                 }
-                else -> Device.UnknownDevice(topic)
+                else -> Device.Microwave(topic)
             }
         }
-        else -> Device.UnknownDevice(topic)
+        else -> Device.UnknownDevice("Unknown_$topic")
     }
     newDevice.topic = newDevice.topic.split("/").take(2).joinToString(separator = "/")
     return newDevice
